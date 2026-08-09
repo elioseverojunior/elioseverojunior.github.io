@@ -1,0 +1,48 @@
+# --- Python ---------------------------------------------------------------- #
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# --- Packaging / build ------------------------------------------------------ #
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- uv / virtualenvs ------------------------------------------------------- #
+# uv.lock IS committed: it is what makes `uv sync` reproducible across machines
+# and CI. Only the resolved environment itself is machine-specific.
+.venv/
+venv/
+env/
+
+# .python-version pins the interpreter for everyone, so it stays tracked.
+
+# --- Tool caches ------------------------------------------------------------ #
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# --- Editors / IDE ---------------------------------------------------------- #
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- OS --------------------------------------------------------------------- #
+.DS_Store
+Thumbs.db
+
+# --- Secrets ---------------------------------------------------------------- #
+# .download-cache.json is deliberately NOT ignored: the published download
+# figures are the point of this repository, and the diff is the audit trail.
+*.dec.yaml
+.env
+.env.*
+!.env.example

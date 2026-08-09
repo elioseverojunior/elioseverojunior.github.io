@@ -1,0 +1,4 @@
+[submodule "profile-data"]
+	path = data
+	url = git@github.com:elioseverojunior/profile-data.git
+	branch = main

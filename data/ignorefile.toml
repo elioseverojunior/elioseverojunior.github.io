@@ -1,0 +1,41 @@
+version = 1
+
+[[gitignore.section]]
+
+[[gitignore.section.rule]]
+ignore = ["__pycache__/", "*.py[cod]", "*$py.class", "*.so"]
+note = "--- Python ---------------------------------------------------------------- #"
+
+[[gitignore.section.rule]]
+ignore = ["build/", "dist/", "*.egg-info/", ".eggs/"]
+note = "--- Packaging / build ------------------------------------------------------ #"
+
+[[gitignore.section.rule]]
+ignore = [".venv/", "venv/", "env/"]
+note = """
+--- uv / virtualenvs ------------------------------------------------------- #
+uv.lock IS committed: it is what makes `uv sync` reproducible across machines
+and CI. Only the resolved environment itself is machine-specific."""
+
+[[gitignore.section.rule]]
+note = ".python-version pins the interpreter for everyone, so it stays tracked."
+
+[[gitignore.section.rule]]
+ignore = [".mypy_cache/", ".ruff_cache/", ".pytest_cache/", ".coverage", ".coverage.*", "htmlcov/", ".tox/", ".nox/"]
+note = "--- Tool caches ------------------------------------------------------------ #"
+
+[[gitignore.section.rule]]
+ignore = [".idea/", ".vscode/", "*.swp", "*.swo"]
+note = "--- Editors / IDE ---------------------------------------------------------- #"
+
+[[gitignore.section.rule]]
+ignore = [".DS_Store", "Thumbs.db"]
+note = "--- OS --------------------------------------------------------------------- #"
+
+[[gitignore.section.rule]]
+add = [".env.example"]
+ignore = ["*.dec.yaml", ".env", ".env.*"]
+note = """
+--- Secrets ---------------------------------------------------------------- #
+.download-cache.json is deliberately NOT ignored: the published download
+figures are the point of this repository, and the diff is the audit trail."""
