@@ -129,7 +129,17 @@ export interface SiteEducation {
   readonly degree: string;
   readonly field: string;
   readonly institution: string;
-  readonly year: string;
+  /**
+   * Year of completion, carried as the number the record states. Nothing
+   * computes with it — the component renders it directly — so it is never
+   * stringified at the adapter: `String(undefined)` is the one conversion that
+   * would put the text "undefined" on the page instead of failing.
+   *
+   * Optional because a course still in progress has no completion year.
+   */
+  readonly year?: number;
+  /** `finished` or `in-progress`, so the view can say which. */
+  readonly state: string;
 }
 
 export interface SiteCertification {
