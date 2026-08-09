@@ -1,0 +1,108 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: >-
+          Branch, tag or SHA to build. Left empty, actions/checkout falls back to
+          the ref that triggered the run, which is what push and manual runs
+          want. refresh.yml passes a branch name instead: the download-cache
+          commit it has just pushed is newer than the SHA that started it, and
+          building the triggering SHA would publish the stale figures.
+        type: string
+        required: false
+        default: ""
+
+# GitHub serves one Pages deployment at a time, so overlapping runs queue rather
+# than race. They are never cancelled mid-flight: a run cancelled between the
+# artifact upload and the deployment leaves the live site on the previous build
+# with nothing queued to retry it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+# Nothing is granted by default. Each job below asks for exactly what it uses.
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+
+      # Installs the mise-managed tools, restores the Bun cache, installs with
+      # --frozen-lockfile and audits blocked post-install scripts. It also
+      # applies the github-actions[bot] git identity via bot-setup — unused in
+      # this job, which commits nothing, but the composite is deliberately one
+      # entry point rather than two so no job can skip half of it.
+      #
+      # --frozen-lockfile matters here because bunfig.toml leaves it off:
+      # adding a dependency locally has to be allowed to update the lockfile,
+      # whereas a CI build that quietly resolves something other than bun.lock
+      # is a build nobody can reproduce.
+      - uses: ./.github/actions/setup
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Build
+        run: bun run build
+
+      # docusaurus build exits non-zero on a render failure, so this is a floor
+      # check rather than the primary guard — the case it covers is a future
+      # regression that exits 0 on truncated output. Never add continue-on-error
+      # or "|| true" here: doing so would publish unverified output over a
+      # working site.
+      - name: Verify the built site
+        run: |
+          set -euo pipefail
+
+          for required in build/index.html build/cv.html; do
+            test -s "$required" || {
+              echo "::error::$required is missing or empty; refusing to publish."
+              exit 1
+            }
+          done
+
+          # docusaurus.config.ts sets onBrokenAnchors to 'warn' because these
+          # ids are emitted by React section components, and Docusaurus' anchor
+          # checker only collects anchors it can extract from Markdown headings.
+          # That leaves nothing to catch a renamed section id except this, and
+          # a navbar whose links silently scroll nowhere is the failure mode.
+          #
+          # The quotes are optional in the pattern because the production
+          # minifier drops them: this page ships `id=impact>`, not `id="impact">`.
+          for anchor in impact history stack shipped; do
+            grep -qE "id=\"?${anchor}\"?[ />]" build/index.html || {
+              echo "::error::the navbar links to #$anchor, but the built page has no element with that id."
+              exit 1
+            }
+          done
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      # Creating the Pages deployment, and minting the OIDC token that
+      # deploy-pages exchanges for permission to create it. Neither is implied
+      # by the default workflow token.
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        id: deploy
