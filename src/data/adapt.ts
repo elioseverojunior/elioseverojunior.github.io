@@ -45,7 +45,28 @@ function normalizeSkillName(name: string): string {
 function toSiteSkill(skill: Skill): SiteSkill {
   // Highlighted on `level`, not `prominence` — see the skill-group mapping in
   // adaptLanding for why depth is the signal a reader is actually scanning for.
-  return { name: skill.name, level: skill.level, core: skill.level === 5 };
+  // Highlighted from level 4 up — see the skill-group mapping in adaptLanding
+  // for why the threshold sits there rather than at 5.
+  return { name: skill.name, level: skill.level, core: skill.level >= 4 };
+}
+
+/**
+ * Deepest first, then alphabetical.
+ *
+ * The source order is authored per group, which put a level-2 tool above a
+ * level-5 one wherever the list happened to be written that way. Sorting by
+ * depth makes each group lead with what is actually owned; the name tiebreak
+ * keeps equal-depth runs stable and scannable rather than dependent on how the
+ * YAML was typed.
+ *
+ * `localeCompare` rather than `<`, so "C#" and ".NET Framework" sort where a
+ * reader expects rather than by code point.
+ */
+function sortByDepthThenName(skills: readonly SiteSkill[]): SiteSkill[] {
+  return [...skills].sort(
+    (a, b) =>
+      (b.level ?? 0) - (a.level ?? 0) || a.name.localeCompare(b.name, "en"),
+  );
 }
 
 function sumDownloads(projects: readonly SiteProject[]): number {
@@ -246,22 +267,52 @@ export function adaptLanding(
     };
   });
 
+  // `skill_groups` is presentation and `skills` is the record; this is the join
+  // between them, and a name present in one but not the other is a data error
+  // rather than a rendering choice. Collected across every group before
+  // throwing, so one build reports all of them instead of one per run.
+  //
+  // It fails loudly because the alternative is what shipped: an unmatched name
+  // renders its label with an empty depth rail, which reads as a broken
+  // component rather than a missing entry. Java, Alloy, Jaeger and Kiali sat
+  // on the live page that way until someone looked closely at a screenshot.
+  const unmatched: string[] = [];
+
   const skillGroups: SiteSkillGroup[] = record.skill_order
     .map((label) => ({
       id: label.toLowerCase().replace(/\s+/g, "-"),
       label,
       skills: (record.skill_groups[label] ?? []).map((name) => {
         const known = depthByName.get(normalizeSkillName(name));
-        // Highlighted on depth, not on `prominence`. `level` 5 is "daily
-        // working tool; designs, owns and debugs it unaided in production" —
-        // an assessment of the work itself, which is what a reader scanning
-        // the stack is trying to judge. `prominence` answers a different
-        // question (which direction the career is heading) and is left to the
-        // consumers that ask it.
-        return { name, level: known?.level, core: known?.level === 5 };
+        if (known === undefined) {
+          unmatched.push(`${label}/${name}`);
+        }
+        // Highlighted on depth, not on `prominence`, and from level 4 rather
+        // than 5. The record draws its line there too: 4 is "delivered to
+        // production unaided", 3 is "delivered with support, or in an earlier
+        // role" — so 4 is the first level that says the work was owned. A
+        // threshold of 5 dimmed tools carried to production single-handed,
+        // which is the opposite of what the highlight is for.
+        //
+        // `prominence` answers a different question (which direction the
+        // career is heading) and is left to the consumers that ask it.
+        return { name, level: known?.level, core: (known?.level ?? 0) >= 4 };
       }),
     }))
+    .map((group) => ({ ...group, skills: sortByDepthThenName(group.skills) }))
     .filter((group) => group.skills.length > 0);
+
+  if (unmatched.length > 0) {
+    // The normalized form is what actually failed to match, so it is worth
+    // printing: "Grafana Cloud" and "grafanacloud" look like different
+    // problems until you know the join strips punctuation and vendor prefixes.
+    throw new Error(
+      `skill_groups names with no entry in skills[]: ${unmatched.join(", ")}. ` +
+        `Add each to skills[] in data/profile.yml, or remove it from its group. ` +
+        `Names are matched after normalisation (lowercased, punctuation removed, ` +
+        `a leading aws/amazon/hashicorp/apache dropped), so "AWS Athena" matches "Athena".`,
+    );
+  }
 
   const crates: SiteProject[] = record.projects
     .filter((project) => project.kind === "crate")
@@ -435,15 +486,13 @@ export function adaptRecord(
   const skillGroups: SiteSkillGroup[] = KIND_ORDER.map((kind) => ({
     id: kind,
     label: KIND_LABELS[kind],
-    skills: record.skills
-      .filter((skill) => skill.kind === kind)
-      .sort((a, b) => {
-        const prominence =
-          (a.prominence ?? Number.MAX_SAFE_INTEGER) -
-          (b.prominence ?? Number.MAX_SAFE_INTEGER);
-        return prominence !== 0 ? prominence : b.level - a.level;
-      })
-      .map(toSiteSkill),
+    // Same ordering as the landing page: depth first, then name. This used to
+    // lead with `prominence`, which sorted by where the career is heading
+    // rather than by what is owned — and put an unrated tool above a level-5
+    // one, since absent prominence sorts last.
+    skills: sortByDepthThenName(
+      record.skills.filter((skill) => skill.kind === kind).map(toSiteSkill),
+    ),
   })).filter((group) => group.skills.length > 0);
 
   const projects: SiteProject[] = record.projects
