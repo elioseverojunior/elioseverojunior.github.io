@@ -106,7 +106,7 @@ experience:
     end: present
     featured: true
     bullets:
-      - Led the KOPS to AWS EKS 1.33 migration of the core application estate using Route53 weighted routing, Argo Rollouts and Istio traffic shifting, completing cutover without customer-facing downtime.
+      - Led the KOPS 1.18.20 to AWS EKS 1.33 migration of the core application estate using Route53 weighted routing, Argo Rollouts and Istio traffic shifting, completing cutover without customer-facing downtime.
       - Containerized legacy workloads and authored Helm charts guarded by values.schema.json, rejecting invalid GitOps values before they reach a cluster.
       - Provisioned data-lake and analytics infrastructure with Terraform and OpenTofu across Athena, Glue Data Catalog, Redshift, Step Functions and Airflow, applying Lake Formation column- and table-level governance for least-privilege analyst access.
       - Codified observability as infrastructure in Terraform across Grafana Cloud dashboards, Loki log pipelines, Prometheus alert rules, Datadog dashboards and label-based Slack routing with OpenTelemetry.
@@ -117,12 +117,14 @@ experience:
     end: 2024-10
     featured: true
     bullets:
+      - Tuned Karpenter-based autoscaling and cluster ingress to absorb variable demand without over-provisioning.
+      - Gated production deployment with Semgrep and Snyk scanning, SonarQube quality gates, SOPS-encrypted Helm secrets and ArgoCD sync policies.
+      - Moved application delivery onto declarative GitOps, with ArgoCD reconciling Helm releases against Git so live EKS state could not drift from the committed source.
+      - Imported existing AWS resources into Terraform state, bringing hand-provisioned infrastructure under version control and plan review.
       - Provisioned secure Amazon SageMaker and Bedrock endpoints with Terraform using scoped IAM execution roles, VPC network isolation and per-workload budget guardrails.
       - Maintained multi-environment GitLab CI/CD pipelines enforcing a strict validate, plan and gated apply workflow with Jira ticket-first traceability.
-      - Tuned Karpenter-based autoscaling and cluster ingress to absorb variable demand without over-provisioning.
-      - Gated production deployment with SAST scanning, SonarQube quality gates, SOPS-encrypted Helm secrets and ArgoCD sync policies.
   - title: SRE Cloud Engineering Manager
-    company: Nutrien Soluções Agrícolas
+    company: Nutrien Agriculture Solutions
     start: 2022-04
     end: 2023-09
     featured: true
@@ -133,7 +135,7 @@ experience:
       - Drove FinOps rightsizing, automated resource lifecycle management and decommissioning, reporting spend directly to the director.
       - Mentored senior and junior engineers into end-to-end incident ownership.
   - title: Senior SRE Cloud Engineer
-    company: Passei Direto
+    company: Passei Direto UOL EdTec
     start: 2021-11
     end: 2022-04
     featured: true
@@ -142,7 +144,7 @@ experience:
       - Implemented infrastructure as code with Terraform, Terragrunt and Pulumi, and maintained CI/CD across Jenkins and GitHub Actions.
       - Hardened platform tooling including HashiCorp Vault secret delivery, Backstage service catalog and shared Jenkins libraries, instrumenting Sentry error tracking and SonarQube analysis.
   - title: DevOps Engineering Lead
-    company: Rdi Software
+    company: RDI Software - Capgemini Americas Subsidiary
     start: 2020-03
     end: 2021-11
     # Featuring any one Rdi entry expands the whole 2017-2021 tenure: the three
@@ -154,32 +156,32 @@ experience:
       - Migrated the traffic layer from standard ingress controllers to Istio service mesh and from MuleSoft to AWS API Gateway using progressive traffic shifting, completing both cutovers without customer transaction impact.
       - Operated service discovery and secret management with HashiCorp Consul and Vault, removing static credentials from microservice deployment paths.
   - title: Senior Software Developer and Senior DevOps Engineer
-    company: Rdi Software
+    company: RDI Software - Capgemini Americas Subsidiary
     start: 2018-11
     end: 2020-03
-    featured: false
+    featured: true
     bullets:
       - Engineered the decomposition of a monolithic e-commerce platform into decoupled microservices handling order and payment loops, using Terraform, Helm and reusable Kubernetes deployment modules to isolate failure domains.
       - Automated infrastructure provisioning and operational tooling with Terraform, Helm, Bash, Python, Ruby, Go and PowerShell across AWS EC2, S3 and Lambda.
       - Delivered C# fixes in the product layer and drove live upgrades on production KOPS clusters.
   - title: Software Developer and DevOps
-    company: Rdi Software
+    company: RDI Software - McDonald's Subsidiary
     start: 2017-07
     end: 2018-11
-    featured: false
+    featured: true
     bullets:
       - Developed features and defect fixes for a global quick-service restaurant e-commerce platform using C# and .NET.
       - Automated infrastructure provisioning with Terraform and Chef across multiple Linux distributions.
   - title: Software Developer DevOps
-    company: Wf - Brains For Your Business
+    company: Web Foundations - Brains For Your Business
     start: 2016-05
     end: 2017-07
-    featured: false
+    featured: true
     bullets:
       - Built automated CI/CD pipelines from scratch with Jenkins and GitLab SCM for high-volume banking systems at a top-tier Brazilian bank.
       - Managed IT infrastructure including servers, networks and Zabbix monitoring, and developed IoT-connected web and support systems.
   - title: Software Developer and DevOps
-    company: Questor Sistemas
+    company: Questor Systems
     start: 2014-11
     end: 2016-05
     featured: false
@@ -187,7 +189,7 @@ experience:
       - Developed ERP features on the .NET Framework covering account management and product issuance routines.
       - Managed PostgreSQL and SQL Server databases and stored procedures.
   - title: Junior Software Developer
-    company: Bradesco
+    company: Bradesco Bank
     start: 2008-04
     end: 2014-08
     featured: false

@@ -47,86 +47,87 @@ person:
 #   2  familiar; used incidentally, or superseded years ago
 #   1  aware only
 skills:
-  - {id: postgres,   name: PostgreSQL,     kind: database,      level: 5, prominence: 3}
+  - {id: postgres,   name: PostgreSQL,     kind: database,      level: 5, prominence: 1}
   - {id: terraform,  name: Terraform,      kind: iac,           level: 5, prominence: 1}
-  - {id: jenkins,    name: Jenkins,        kind: cicd,          level: 5, prominence: 2}
+  - {id: terragurnt, name: Terragrunt,     kind: iac,           level: 5, prominence: 1}
+  - {id: jenkins,    name: Jenkins,        kind: cicd,          level: 5, prominence: 1}
   - {id: gh-actions, name: GitHub Actions, kind: cicd,          level: 5, prominence: 1}
-  - {id: scrum,      name: Scrum,          kind: methodology,   level: 5}
   - {id: eks,        name: EKS,            kind: container,     level: 5, prominence: 1}
   - {id: istio,      name: Istio,          kind: container,     level: 5, prominence: 1}
   - {id: karpenter,  name: Karpenter,      kind: container,     level: 5, prominence: 1}
+  - {id: scrum,      name: Scrum,          kind: methodology,   level: 5, prominence: 1}
   # Programming Languages
-  - {id: csharp,     name: "C#",       kind: language, level: 5, prominence: 2}
-  - {id: python,     name: Python,     kind: language, level: 5, prominence: 2}
-  - {id: typescript, name: TypeScript, kind: language, level: 5, prominence: 2}
-  - {id: go,         name: Go,         kind: language, level: 5, prominence: 2}
+  - {id: csharp,     name: "C#",       kind: language, level: 5, prominence: 1}
+  - {id: python,     name: Python,     kind: language, level: 5, prominence: 1}
+  - {id: typescript, name: TypeScript, kind: language, level: 5, prominence: 1}
+  - {id: go,         name: Go,         kind: language, level: 5, prominence: 1}
   - {id: rust,       name: Rust,       kind: language, level: 5, prominence: 1}
-  - {id: groovy,     name: Groovy,     kind: language, level: 5, prominence: 2}
-  - {id: ruby,       name: Ruby,       kind: language, level: 3}
-  - {id: bash,       name: Bash,       kind: language, level: 5, prominence: 2}
-  - {id: powershell, name: PowerShell, kind: language, level: 4}
-  - {id: sql,        name: SQL,        kind: language, level: 5, prominence: 2}
+  - {id: groovy,     name: Groovy,     kind: language, level: 5, prominence: 1}
+  - {id: ruby,       name: Ruby,       kind: language, level: 3, prominence: 1}
+  - {id: bash,       name: Bash,       kind: language, level: 5, prominence: 1}
+  - {id: powershell, name: PowerShell, kind: language, level: 4, prominence: 1}
+  - {id: sql,        name: SQL,        kind: language, level: 5, prominence: 1}
   # Programming Frameworks
-  - {id: dotnet-framework, name: .NET Framework, kind: framework, level: 5}
-  - {id: aspnet,           name: ASP.NET,        kind: framework, level: 5}
-  - {id: helm,             name: Helm,           kind: framework, level: 5, prominence: 2}
+  - {id: dotnet-framework, name: .NET Framework, kind: framework, level: 5, prominence: 1}
+  - {id: aspnet,           name: ASP.NET,        kind: framework, level: 5, prominence: 1}
+  - {id: helm,             name: Helm,           kind: framework, level: 5, prominence: 1}
   # Databases & Storage
-  - {id: sql-server, name: SQL Server,      kind: database, level: 5}
-  - {id: rds,        name: Amazon RDS,      kind: database, level: 5, prominence: 3}
-  - {id: redshift,   name: Amazon Redshift, kind: database, level: 5, prominence: 2}
-  - {id: s3,         name: Amazon S3,       kind: storage,  level: 5, prominence: 3}
+  - {id: sql-server, name: SQL Server,      kind: database, level: 5, prominence: 1}
+  - {id: rds,        name: Amazon RDS,      kind: database, level: 5, prominence: 1}
+  - {id: redshift,   name: Amazon Redshift, kind: database, level: 5, prominence: 1}
+  - {id: s3,         name: Amazon S3,       kind: storage,  level: 5, prominence: 1}
   # Data Tools
-  - {id: airflow,        name: Apache Airflow,     kind: cicd,     level: 4, prominence: 2}
-  - {id: glue,           name: AWS Glue,           kind: database, level: 4, prominence: 2}
-  - {id: athena,         name: AWS Athena,         kind: database, level: 4, prominence: 2}
-  - {id: lake-formation, name: AWS Lake Formation, kind: storage,  level: 3, prominence: 3}
-  - {id: step-functions, name: AWS Step Functions, kind: cicd,     level: 5, prominence: 2}
-  - {id: sqs,            name: Amazon SQS,         kind: storage,  level: 5, prominence: 3}
-  - {id: liquibase,      name: Liquibase,          kind: database, level: 3, prominence: 3}
+  - {id: airflow,        name: Apache Airflow,     kind: cicd,     level: 4, prominence: 1}
+  - {id: glue,           name: AWS Glue,           kind: database, level: 4, prominence: 1}
+  - {id: athena,         name: AWS Athena,         kind: database, level: 4, prominence: 1}
+  - {id: lake-formation, name: AWS Lake Formation, kind: storage,  level: 3, prominence: 1}
+  - {id: step-functions, name: AWS Step Functions, kind: cicd,     level: 5, prominence: 1}
+  - {id: sqs,            name: Amazon SQS,         kind: storage,  level: 5, prominence: 1}
+  - {id: liquibase,      name: Liquibase,          kind: database, level: 3, prominence: 1}
   # Visualization Tools
-  - {id: grafana,       name: Grafana,           kind: observability, level: 5, prominence: 2}
+  - {id: grafana,       name: Grafana,           kind: observability, level: 5, prominence: 1}
   - {id: grafana-cloud, name: Grafana Cloud,     kind: observability, level: 5, prominence: 1}
-  - {id: datadog,       name: Datadog,           kind: observability, level: 5, prominence: 2}
-  - {id: new-relic,     name: New Relic,         kind: observability, level: 5}
-  - {id: cloudwatch,    name: Amazon CloudWatch, kind: observability, level: 5, prominence: 2}
+  - {id: datadog,       name: Datadog,           kind: observability, level: 5, prominence: 1}
+  - {id: new-relic,     name: New Relic,         kind: observability, level: 5, prominence: 1}
+  - {id: cloudwatch,    name: Amazon CloudWatch, kind: observability, level: 5, prominence: 1}
   # Cloud
   - {id: aws,   name: AWS,   kind: cloud, level: 5, prominence: 1}
-  - {id: azure, name: Azure, kind: cloud, level: 3, prominence: 3}
-  - {id: gcp,   name: GCP,   kind: cloud, level: 3, prominence: 3}
+  - {id: azure, name: Azure, kind: cloud, level: 4, prominence: 1}
+  - {id: gcp,   name: GCP,   kind: cloud, level: 4, prominence: 1}
   # ML/GenAI Frameworks & Tools
-  - {id: sagemaker,   name: Amazon SageMaker, kind: cloud,     level: 4, prominence: 2}
-  - {id: bedrock,     name: Amazon Bedrock,   kind: cloud,     level: 5, prominence: 2}
+  - {id: sagemaker,   name: Amazon SageMaker, kind: cloud,     level: 4, prominence: 1}
+  - {id: bedrock,     name: Amazon Bedrock,   kind: cloud,     level: 5, prominence: 1}
   - {id: claude-code, name: Claude Code,      kind: framework, level: 5, prominence: 1}
   # Others
   - {id: kubernetes,       name: Kubernetes,       kind: container,     level: 5, prominence: 1}
-  - {id: kops,             name: KOPS,             kind: container,     level: 4, prominence: 3}
+  - {id: kops,             name: KOPS,             kind: container,     level: 4, prominence: 1}
   - {id: opentofu,         name: OpenTofu,         kind: iac,           level: 5, prominence: 1}
-  - {id: terragrunt,       name: Terragrunt,       kind: iac,           level: 5, prominence: 3}
-  - {id: pulumi,           name: Pulumi,           kind: iac,           level: 5}
+  - {id: terragrunt,       name: Terragrunt,       kind: iac,           level: 5, prominence: 1}
+  - {id: pulumi,           name: Pulumi,           kind: iac,           level: 5, prominence: 1}
   - {id: argocd,           name: ArgoCD,           kind: cicd,          level: 5, prominence: 1}
   - {id: argo-rollouts,    name: Argo Rollouts,    kind: cicd,          level: 5, prominence: 1}
-  - {id: flagger,          name: Flagger,          kind: cicd,          level: 5}
-  - {id: docker,           name: Docker,           kind: container,     level: 5, prominence: 2}
-  - {id: gitlab-cicd,      name: GitLab CI/CD,     kind: cicd,          level: 4, prominence: 2}
+  - {id: flagger,          name: Flagger,          kind: cicd,          level: 5, prominence: 1}
+  - {id: docker,           name: Docker,           kind: container,     level: 5, prominence: 1}
+  - {id: gitlab-cicd,      name: GitLab CI/CD,     kind: cicd,          level: 4, prominence: 1}
   - {id: prometheus,       name: Prometheus,       kind: observability, level: 5, prominence: 1}
-  - {id: opentelemetry,    name: OpenTelemetry,    kind: observability, level: 5, prominence: 2}
-  - {id: alloy,            name: Alloy,            kind: observability, level: 5, prominence: 2}
-  - {id: loki,             name: Loki,             kind: observability, level: 5, prominence: 2}
-  - {id: hashicorp-vault,  name: HashiCorp Vault,  kind: iac,           level: 5, prominence: 3}
-  - {id: hashicorp-consul, name: HashiCorp Consul, kind: iac,           level: 5}
-  - {id: terraform,        name: Terraform,        kind: iac,           level: 5}
-  - {id: sentinel,         name: Sentinel,         kind: iac,           level: 5}
-  - {id: concourse,        name: Concourse,        kind: cicd,          level: 4}
-  - {id: sops,             name: SOPS,             kind: iac,           level: 5, prominence: 3}
-  - {id: sonarqube,        name: SonarQube,        kind: cicd,          level: 5, prominence: 3}
-  - {id: snyk,             name: Snyk,             kind: cicd,          level: 5, prominence: 3}
-  - {id: zabbix,           name: Zabbix,           kind: observability, level: 4, prominence: 2}
-  - {id: backstage,        name: Backstage,        kind: cicd,          level: 4, prominence: 3}
-  - {id: sentry,           name: Sentry,           kind: observability, level: 4, prominence: 2}
-  - {id: chef,             name: Chef,             kind: iac,           level: 4}
-  - {id: tfs,              name: TFS,              kind: cicd,          level: 4}
-  - {id: linux,            name: Linux,            kind: container,     level: 5, prominence: 2}
-  - {id: jira,             name: Jira,             kind: methodology,   level: 5}
+  - {id: opentelemetry,    name: OpenTelemetry,    kind: observability, level: 5, prominence: 1}
+  - {id: alloy,            name: Alloy,            kind: observability, level: 5, prominence: 1}
+  - {id: loki,             name: Loki,             kind: observability, level: 5, prominence: 1}
+  - {id: hashicorp-vault,  name: HashiCorp Vault,  kind: iac,           level: 5, prominence: 1}
+  - {id: hashicorp-consul, name: HashiCorp Consul, kind: iac,           level: 5, prominence: 1}
+  - {id: terraform,        name: Terraform,        kind: iac,           level: 5, prominence: 1}
+  - {id: sentinel,         name: Sentinel,         kind: iac,           level: 5, prominence: 1}
+  - {id: concourse,        name: Concourse,        kind: cicd,          level: 4, prominence: 1}
+  - {id: sops,             name: SOPS,             kind: iac,           level: 5, prominence: 1}
+  - {id: sonarqube,        name: SonarQube,        kind: cicd,          level: 5, prominence: 1}
+  - {id: snyk,             name: Snyk,             kind: cicd,          level: 5, prominence: 1}
+  - {id: zabbix,           name: Zabbix,           kind: observability, level: 4, prominence: 1}
+  - {id: backstage,        name: Backstage,        kind: cicd,          level: 4, prominence: 1}
+  - {id: sentry,           name: Sentry,           kind: observability, level: 4, prominence: 1}
+  - {id: chef,             name: Chef,             kind: iac,           level: 4, prominence: 1}
+  - {id: tfs,              name: TFS,              kind: cicd,          level: 4, prominence: 1}
+  - {id: linux,            name: Linux,            kind: container,     level: 5, prominence: 1}
+  - {id: jira,             name: Jira,             kind: methodology,   level: 5, prominence: 1}
 
 experience:
   - id: viafoura
@@ -137,12 +138,16 @@ experience:
     titles: ["Senior SRE Cloud Engineer"]
     tech: [aws, eks, kubernetes, istio, karpenter, terraform, typescript, groovy, gh-actions, kops, argo-rollouts, helm, opentofu, athena, glue, redshift, step-functions, airflow, lake-formation, liquibase, grafana-cloud, loki, prometheus, datadog, opentelemetry, jenkins, argocd]
     metrics:
+      - id: cicd-stack-modernization
+        value: 243
+        unit: applications
+        claim: >-
+          migrated from legacy KOPS 1.18.20 to AWS EKS 1.33
       - id: eks-migration
         value: 243
         unit: applications
         claim: >-
-          migrated from legacy KOPS to AWS EKS 1.33 with zero
-          customer-facing downtime
+          migrated from legacy KOPS 1.18.20 to AWS EKS 1.33
       - id: ec2-spend-reduction
         value: 35
         unit: percent
@@ -200,7 +205,7 @@ experience:
     metrics: []
 
   - id: rdi-lead
-    employer: Rdi Software
+    employer: RDI Software - McDonalds Subsidiary
     industry: quick-service restaurant e-commerce
     start: 2020-03
     end: 2021-11
@@ -215,7 +220,7 @@ experience:
           and Brazil, overseeing engineers and establishing delivery KPIs
 
   - id: rdi-senior
-    employer: Rdi Software
+    employer: RDI Software - McDonalds Subsidiary
     industry: quick-service restaurant e-commerce
     start: 2018-11
     end: 2020-03
@@ -224,7 +229,7 @@ experience:
     metrics: []
 
   - id: rdi-dev
-    employer: Rdi Software
+    employer: RDI Software - McDonalds Subsidiary
     industry: quick-service restaurant e-commerce
     start: 2017-07
     end: 2018-11
