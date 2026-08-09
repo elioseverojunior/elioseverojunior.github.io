@@ -19,8 +19,8 @@ export default function Home(): ReactNode {
       <Hero profile={profile} />
       <main>
         <Impact profile={profile} />
-        <History profile={profile} />
         <Stack profile={profile} />
+        <History profile={profile} />
         <Shipped profile={profile} />
         <Credentials profile={profile} />
       </main>

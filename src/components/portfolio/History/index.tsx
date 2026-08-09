@@ -139,7 +139,7 @@ export function History({
   return (
     <Section
       id="history"
-      index="02"
+      index="03"
       label="History"
       title={
         <>

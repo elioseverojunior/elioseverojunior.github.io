@@ -47,7 +47,7 @@ export function Stack({
   return (
     <Section
       id="stack"
-      index="03"
+      index="02"
       label="Stack"
       title={
         <>
