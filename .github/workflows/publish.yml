@@ -8,11 +8,11 @@ on:
     inputs:
       ref:
         description: >-
-          Branch, tag or SHA to build. Left empty, actions/checkout falls back to
-          the ref that triggered the run, which is what push and manual runs
-          want. refresh.yml passes a branch name instead: the download-cache
-          commit it has just pushed is newer than the SHA that started it, and
-          building the triggering SHA would publish the stale figures.
+          Branch, tag or SHA to build. Left empty, actions/checkout falls back
+          to the ref that triggered the run, which is what every caller wants
+          today — nothing commits ahead of the build any more, so the
+          triggering ref is already the newest thing there is. Kept as an input
+          so a specific commit can be republished by hand without reverting.
         type: string
         required: false
         default: ""
@@ -34,9 +34,42 @@ jobs:
     permissions:
       contents: read
     steps:
+      # A GitHub App installation token, minted for this run and revoked when
+      # the job ends. It exists because profile-data is private and the default
+      # workflow token is scoped to this repository alone, so the submodule
+      # fetch 403s with it.
+      #
+      # An App rather than a PAT: the credential is short-lived, its scope is
+      # declared here in the workflow instead of remembered in someone's
+      # account settings, and it is not tied to a person who might lose access.
+      # `client-id`, not the deprecated `app-id`. APP_CLIENT_SECRET is not used
+      # — that is for the OAuth web flow, not installation tokens.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          # Both repositories, not just profile-data: checkout authenticates
+          # the superproject fetch with this same token, and one scoped to the
+          # submodule alone cannot clone the repository it is checking out.
+          repositories: |
+            elioseverojunior.github.io
+            profile-data
+          # Reading source is the whole job. Naming it keeps the token narrow
+          # even if the App itself is granted more.
+          permission-contents: read
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.ref }}
+          # data/ is the profile-data submodule and holds every fact this site
+          # renders, so without it the build fails on a missing profile.yml
+          # rather than producing a thinner page.
+          submodules: recursive
+          # .gitmodules records an SSH URL; checkout rewrites it to HTTPS and
+          # authenticates with this token, which is why no deploy key is needed.
+          token: ${{ steps.app-token.outputs.token }}
 
       # Installs the mise-managed tools, restores the Bun cache, installs with
       # --frozen-lockfile and audits blocked post-install scripts. It also
@@ -49,6 +82,18 @@ jobs:
       # whereas a CI build that quietly resolves something other than bun.lock
       # is a build nobody can reproduce.
       - uses: ./.github/actions/setup
+
+      # Before the build, because the build reads the cache this writes. The
+      # registries are public, so no credentials are involved.
+      #
+      # The script keeps the previous figure for any package it cannot reach
+      # and exits non-zero only when every lookup fails, so a transient outage
+      # publishes slightly stale figures rather than zeroing the strongest
+      # evidence on the page. It writes into data/, which is the submodule
+      # working tree — nothing commits that here; the figures are baked into
+      # the rendered HTML and the checkout is discarded with the runner.
+      - name: Refresh registry download counts
+        run: bun run fetch:downloads
 
       - name: Typecheck
         run: bun run typecheck

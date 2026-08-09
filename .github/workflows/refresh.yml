@@ -8,62 +8,32 @@ on:
     - cron: "17 6 * * 1"
   workflow_dispatch:
 
-# Nothing is granted by default. Each job below asks for exactly what it uses.
+# Nothing is granted by default. The job below asks for exactly what it uses.
 permissions: {}
 
-# A weekly run overlapping a manual one would have two runs writing the same
-# cache file and racing to publish the result. Queue instead, and never cancel:
-# publish.yml's own concurrency comment covers why a publish in flight is the
-# one thing not worth interrupting.
+# A weekly run overlapping a manual one would have two runs racing to publish
+# the same content. Queue instead, and never cancel: publish.yml's own
+# concurrency comment covers why a publish in flight is the one thing not worth
+# interrupting.
 concurrency:
   group: refresh
   cancel-in-progress: false
 
 jobs:
-  downloads:
-    runs-on: ubuntu-latest
-    permissions:
-      # Committing the refreshed cache back to this repository.
-      contents: write
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      # Toolchain, dependencies, post-install audit — and, the part this job
-      # depends on, the github-actions[bot] git identity that the commit step
-      # below relies on. bot-setup writes it to the global git config, so it
-      # survives into every later step of this job without being restated.
-      - uses: ./.github/actions/setup
-
-      # crates.io and the Terraform Registry are both public, so this needs no
-      # credentials. The script keeps the previous figure for any package it
-      # cannot reach and fails only when every lookup fails, so a transient
-      # outage refreshes what it can rather than zeroing the strongest evidence
-      # on the site.
-      - name: Refresh registry download counts
-        run: bun run fetch:downloads
-
-      - name: Commit the refreshed counts
-        run: |
-          set -euo pipefail
-
-          if git diff --quiet -- data/.download-cache.json; then
-            echo "Download counts unchanged."
-            exit 0
-          fi
-
-          # No git config here on purpose: .github/actions/bot-setup already
-          # set the github-actions[bot] identity globally, and restating it
-          # would be a second place to change it and a second place to get it
-          # wrong.
-          git add data/.download-cache.json
-          git commit -m 'chore: refresh registry download counts'
-          git push
-
   republish:
-    needs: downloads
-    # Rebuild and redeploy so the published figures match the cache above. This
-    # is idempotent — unchanged sources render an identical site — so it costs
-    # nothing on the weeks where no count moved.
+    # A rebuild is the whole job. publish.yml refreshes the registry download
+    # counts before it builds, so the weekly run picks up new figures simply by
+    # building again — there is no cache to commit here and nothing to push.
+    #
+    # This job used to fetch and commit data/.download-cache.json itself. That
+    # stopped being possible when data/ became the profile-data submodule: the
+    # file belongs to another repository now, so committing it from here would
+    # need write access to that repo and a gitlink bump in this one — to
+    # persist a figure the next build re-fetches anyway.
+    #
+    # No `ref` is passed for the same reason: nothing commits ahead of the
+    # build any more, so checkout's default (the ref that triggered the run) is
+    # already the newest thing there is.
     #
     # A called workflow can only narrow the calling workflow's token, never
     # widen it, so publish.yml's deploy job cannot grant itself the pages and
@@ -72,11 +42,9 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    # APP_PRIVATE_KEY has to reach the called workflow, or it cannot mint the
+    # App token its checkout needs to read the private profile-data submodule.
+    # `vars` needs no equivalent — repository variables are visible to a called
+    # workflow already; only secrets have to be passed deliberately.
+    secrets: inherit
     uses: ./.github/workflows/publish.yml
-    with:
-      # Build the branch tip rather than the SHA that started this run: the
-      # commit the job above just pushed is newer than it. Nothing else picks
-      # that commit up either — a push authenticated with GITHUB_TOKEN
-      # deliberately does not trigger a workflow, so publish.yml's own push
-      # trigger will not fire for it.
-      ref: ${{ github.ref_name }}
