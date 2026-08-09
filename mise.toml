@@ -1,0 +1,665 @@
+[settings]
+color = true
+experimental = true
+idiomatic_version_file = true
+# This is a Python project pinned by `.python-version` (3.14); letting mise
+# read that file keeps the pin in one place instead of restating it here.
+idiomatic_version_file_enable_tools = ["python"]
+legacy_version_file = false
+lockfile = true
+not_found_auto_install = true
+quiet = true
+
+[tools]
+python = "3.14"
+uv = "latest"
+
+gh = "latest"
+gitleaks = "latest"
+jq = "latest"
+yq = "latest"
+
+# TOML formatter for pyproject.toml and ignorefile.toml.
+taplo = "latest"
+
+# Markdown -> .docx converter for the master CV. That renderer emits text so
+# the brain document diffs in git; pandoc turns the same file into the
+# sendable artefact, so there is exactly one source and no second layout to
+# keep in step. Styling comes from companies/main/reference.docx.
+pandoc = "latest"
+
+# Markdown linter. Pinned here because the cargo-installed copy on this
+# machine is 0.2.33 while the registry serves 0.2.47 -- mise upgrades it and
+# makes the version reproducible. Scope is governed by `.rumdl.toml`, which
+# excludes companies/, templates/ and archive/: see `md:check` below.
+rumdl = "latest"
+
+# No generic YAML linter is pinned here on purpose. profile.yaml and
+# companies/*/rules.yaml are the source of truth, so they looked like obvious
+# lint targets -- but measured against both candidates neither found a single
+# real defect: yamllint-rs 0.1.4 raised 12 truthy warnings by scanning comment
+# prose ("hits on technology names"), and yamllint 1.38.0 raised 119 comma
+# warnings fighting the deliberate column alignment in
+# `- {name: English,    level: Fluent}`. Both also reject prose-length lines.
+# `ai-cvs validate` already checks this data's schema and referential
+# integrity, which is the part that can actually be wrong, so `lint` gates on
+# that instead.
+
+# aqua ships hk for darwin/arm64 but not darwin/amd64, so macOS is narrowed to
+# arm64 with the compound "<os>/<arch>" form -- mise parses both halves, and this
+# is the whole platform gate. The separate `arch` key does NOT filter (verified:
+# arch = ["ppc64"] still resolves on an x64 host); it documents intent only.
+#
+# Note for this machine specifically: it is darwin/amd64 (x86_64), so the gate
+# excludes it and mise will NOT manage hk here. That is correct and expected --
+# hk is already present via cargo at ~/.cargo/bin/hk, so the pre-commit tasks
+# below still run; they just call the tools directly rather than through hk.
+"aqua:hk" = { version = "latest", os = [
+    "linux",
+    "windows",
+    "macos/arm64",
+], arch = [
+    "arm64",
+    "x64",
+], locked = false }
+
+[env]
+ARCH = "{{exec(command='uname -m')}}"
+
+# Name the project after the git remote, falling back to the directory.
+#
+# Three things this form gets right that the obvious spellings do not:
+#   - `$PWD` is wrong: run mise from companies/ and the project renames itself.
+#   - Tera cannot nest `{{ }}` inside `{{ exec(...) }}`; config_root has to be
+#     spliced in with the `~` concatenation operator instead.
+#   - The fallback belongs INSIDE the command substitution. Written as
+#     `basename $(git ...) .git || <fallback>`, an empty remote makes basename
+#     fail on missing operands and the fallback then yields a full path, not a
+#     basename. Putting `|| echo <config_root>` inside `$( )` feeds basename a
+#     real operand either way, so one basename call handles both branches.
+#
+# TOML multi-line literal ('''): the shell needs double quotes around the
+# substitution, and a basic string would require escaping every one of them.
+# Verified both branches: a repo with origin git@github.com:someone/
+# my-cool-repo.git yields "my-cool-repo"; a repo with no remote yields its
+# directory name.
+PROJECT_NAME = '''{{ exec(command='basename "$(git config --get remote.origin.url || echo ' ~ config_root ~ ')" .git') }}'''
+
+[hooks]
+postinstall = '''
+echo "Installed: $MISE_INSTALLED_TOOLS"
+'''
+
+[deps.gh]
+auto = true
+
+# === Tool Installation ===
+[tasks.setup]
+alias = ["install", "dev", "dev:setup", "dev:up"]
+description = "Install tools, sourcing from Homebrew when it matches the pin"
+run = '''
+set -eo pipefail
+
+# Homebrew is preferred on macOS when present, but ONLY for a tool whose
+# installed version already equals the pin in [tools] above. None of these ship
+# a versioned formula (there is no swiftlint@0.65.0), so brew tracks whatever is
+# current — honouring it blindly would silently break the pinning this file
+# exists to guarantee. On any mismatch the pin wins and mise installs the tool.
+#
+# Formula names only; versions are read back from [tools] so mise.toml stays the
+# single source of truth.
+BREW_TOOLS="git-cliff gitleaks gh jq rustup scorecard uv yq"
+
+root="$(git rev-parse --show-toplevel)"
+local_cfg="$root/mise.local.toml"
+
+# An empty MISE_DISABLE_TOOLS overrides whatever mise.local.toml sets, so the
+# lockfile is always written from the FULL toolset. A disabled tool is omitted
+# from mise.lock entirely, and a brew machine committing such a lockfile would
+# leave non-brew machines unresolvable. This is why locking no longer needs to
+# delete the local config first.
+MISE_DISABLE_TOOLS= mise lock
+
+have_brew=no
+if [ "$(uname -s)" = "Darwin" ] && command -v brew >/dev/null 2>&1; then
+  have_brew=yes
+fi
+
+# One batched call: six separate `brew list` invocations cost roughly 5x more.
+brew_versions() {
+  [ "$have_brew" = yes ] || return 0
+  brew list --versions $BREW_TOOLS 2>/dev/null | sort || true
+}
+
+# `mise ls --current` merges the global config, so intersecting with BREW_TOOLS
+# below keeps this to the project's own tools.
+pins="$(MISE_DISABLE_TOOLS= mise ls --current --json | jq -r 'to_entries[] | "\(.key) \(.value[0].requested_version)"' | sort)"
+
+# Fingerprint every input that decides this file's content. Hashing mise.lock
+# alone is NOT sufficient: Homebrew moving swiftlint 0.65.0 -> 0.66.0 must force
+# a rewrite, and nothing about that touches the lockfile.
+fingerprint() {
+  printf '%s\n' \
+    "v1" "$(uname -s)" "$(uname -m)" "$have_brew" "$pins" "$(brew_versions)" \
+    "$(shasum -a 256 "$root/mise.lock" 2>/dev/null | cut -d" " -f1)" \
+    | shasum -a 256 | cut -d" " -f1
+}
+
+# `mise install` can settle new entries into mise.lock — a first-time install of
+# a version, or a tool added since the last lock — which leaves the fingerprint
+# just written already stale and costs one redundant rebuild on the next run.
+# Re-stamping afterwards makes the cache converge in a single run.
+refresh_fp() {
+  [ -f "$local_cfg" ] || return 0
+  local now tmp
+  now="$(fingerprint)"
+  if grep -qF "# fingerprint: $now" "$local_cfg"; then
+    return 0
+  fi
+  tmp="$(mktemp)"
+  awk -v fp="$now" '/^# fingerprint: /{ print "# fingerprint: " fp; next } { print }' "$local_cfg" > "$tmp"
+  mv "$tmp" "$local_cfg"
+}
+
+fp="$(fingerprint)"
+if [ -f "$local_cfg" ] && grep -qF "# fingerprint: $fp" "$local_cfg"; then
+  echo "mise.local.toml up to date ($(printf '%s' "$fp" | cut -c1-12))"
+  mise install
+  mise deps
+  refresh_fp
+  exit 0
+fi
+
+lookup() { printf '%s\n' "$2" | awk -v t="$1" '$1 == t { print $2 }'; }
+
+brewed=""
+installed_any=no
+if [ "$have_brew" = yes ]; then
+  state="$(brew_versions)"
+  missing=""
+
+  for f in $BREW_TOOLS; do
+    pin="$(lookup "$f" "$pins")"
+    [ -n "$pin" ] || continue
+    inst="$(lookup "$f" "$state")"
+
+    if [ -z "$inst" ]; then
+      missing="$missing $f"
+    elif [ "$pin" = "latest" ] || [ "$pin" = "$inst" ]; then
+      brewed="$brewed $f"
+      echo "brew $f $inst"
+    else
+      echo "mise $f $pin (Homebrew has $inst)"
+    fi
+  done
+
+  # Only tools that are not installed yet need the slow formula API, and they
+  # are queried in a single batched call.
+  if [ -n "$missing" ]; then
+    stables="$(brew info --json=v2 $missing 2>/dev/null | jq -r '.formulae[] | "\(.name) \(.versions.stable)"' || true)"
+    for f in $missing; do
+      pin="$(lookup "$f" "$pins")"
+      stable="$(lookup "$f" "$stables")"
+      if [ -n "$stable" ] && { [ "$pin" = "latest" ] || [ "$pin" = "$stable" ]; }; then
+        brew install "$f"
+        brewed="$brewed $f"
+        installed_any=yes
+        echo "brew $f $stable (installed)"
+      else
+        echo "mise $f $pin${stable:+ (Homebrew has $stable)}"
+      fi
+    done
+  fi
+fi
+
+# Installing changed what brew reports, so the fingerprint must be recomputed or
+# the next run would see a mismatch and redo all of this for nothing.
+[ "$installed_any" = yes ] && fp="$(fingerprint)"
+
+# disable_tools makes mise step aside so its shims stop shadowing Homebrew's
+# bin. Machine-specific, hence mise.local.toml rather than mise.toml.
+{
+  echo "# Generated by \`mise run install\` - machine-specific, not committed."
+  echo "# fingerprint: $fp"
+  if [ -n "$brewed" ]; then
+    echo "# Tools Homebrew satisfies at the pinned version; mise handles the rest."
+    echo "[settings]"
+    printf 'disable_tools = ['
+    sep=""
+    for f in $brewed; do
+      printf '%s"%s"' "$sep" "$f"
+      sep=", "
+    done
+    printf ']\n'
+  fi
+  # No [tools] section is emitted here: platform gating belongs in mise.toml,
+  # where the compound os = [..., "macos/arm64"] form already covers hk. This
+  # file is only ever about stepping aside for the system package manager.
+} > "$local_cfg"
+
+mise lock
+mise install
+mise deps
+refresh_fp
+'''
+shell = "bash -c"
+
+# === GitHub App credentials ===
+# Pushes the GitHub App credentials from the SOPS store into this repository, so
+# `actions/create-github-app-token` can mint an installation token per run and no
+# long-lived credential is stored anywhere but the encrypted file.
+#
+# The SPLIT between a variable and secrets is not cosmetic. `client-id` is
+# public -- it identifies the app, it appears in the workflow file, and GitHub
+# masks secrets in logs, so storing it as a secret would turn every incidental
+# log line containing it into `***`. `pem_file` and `client_secret` are the
+# actual credentials.
+#
+# `client_id`, NOT `id`: `actions/create-github-app-token` marks `app-id` with
+# `deprecationMessage: "Use 'client-id' instead."` in its own action.yml. The
+# SOPS record carries both, and `id` (4348245) is the one that must NOT be used.
+[tasks."gh:app:sync"]
+alias = ["gas", "gh:app:secrets"]
+description = "Decrypt the SOPS secret store and push the GitHub App credentials to this repository as the APP_CLIENT_ID variable plus APP_PRIVATE_KEY and APP_CLIENT_SECRET secrets. Pass --check to report without writing"
+hide = true
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# DELIBERATELY no `set -x` under --verbose, unlike every other task here. The
+# values below are the app's private key and client secret; tracing the commands
+# that handle them would print both to the terminal and into any CI log. The
+# flag reports names and byte counts instead, which is enough to tell "the key
+# is empty" from "the key is wrong" without disclosing either.
+verbose="${usage_verbose:-false}"
+checking="${usage_check:-false}"
+
+store="${usage_store:-${HOME}/dotfiles/secrets/sops/secrets.enc.yaml}"
+if [ ! -f "${store}" ]; then
+    echo "gh:app:sync: no SOPS store at ${store}" >&2
+    exit 1
+fi
+
+for tool in sops yq gh; do
+    command -v "${tool}" >/dev/null 2>&1 || {
+        echo "gh:app:sync: ${tool} is not installed" >&2
+        exit 1
+    }
+done
+
+# Resolved, not hardcoded, for the reason `gh:branch:protect` resolves its own:
+# a hardcoded owner writes this repository's credentials into whatever fork or
+# rename happens to be checked out.
+repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+owner="${repo%%/*}"
+
+# One decrypt, into a directory only this user can read. Piping sops straight
+# into a loop would decrypt once per field and prompt for the key each time;
+# writing to $TMPDIR without the mode change would leave the plaintext
+# world-readable for as long as the task runs.
+work="$(mktemp -d)"
+chmod 700 "${work}"
+trap 'rm -rf "${work}"' EXIT
+
+plain="${work}/plain.yaml"
+( umask 077; sops -d "${store}" > "${plain}" )
+
+path=".github.\"${owner}\".app_auth"
+if [ "$(yq -r "${path} // \"null\"" "${plain}")" = "null" ]; then
+    echo "gh:app:sync: ${store} has no github.${owner}.app_auth entry" >&2
+    exit 1
+fi
+
+# Written to files rather than shell variables, and fed to `gh` on STDIN. A
+# `--body "$value"` would put the private key in the process argument list,
+# where `ps` shows it to every other process on the machine. Files also preserve
+# the PEM's bytes exactly: a `$(...)` capture strips trailing newlines, and the
+# key must round-trip unchanged.
+extract() {
+    yq -r "${path}.${1} // \"\"" "${plain}" > "${work}/${1}"
+}
+extract client_id
+extract client_secret
+extract pem_file
+
+for field in client_id client_secret pem_file; do
+    if [ ! -s "${work}/${field}" ]; then
+        echo "gh:app:sync: github.${owner}.app_auth.${field} is empty" >&2
+        exit 1
+    fi
+done
+
+# A private key that is not a private key is worth catching here rather than at
+# the first workflow run, where it surfaces as an opaque token-minting failure.
+if ! grep -q 'BEGIN .*PRIVATE KEY' "${work}/pem_file"; then
+    echo "gh:app:sync: github.${owner}.app_auth.pem_file is not a PEM private key" >&2
+    exit 1
+fi
+
+if [ "${verbose}" = true ]; then
+    echo "repo:  ${repo}"
+    echo "store: ${store}"
+    for field in client_id client_secret pem_file; do
+        printf '  %-14s %s bytes\n' "${field}" "$(wc -c < "${work}/${field}" | tr -d ' ')"
+    done
+fi
+
+if [ "${checking}" = true ]; then
+    echo "would set variable APP_CLIENT_ID     from github.${owner}.app_auth.client_id"
+    echo "would set secret   APP_PRIVATE_KEY   from github.${owner}.app_auth.pem_file"
+    echo "would set secret   APP_CLIENT_SECRET from github.${owner}.app_auth.client_secret"
+    echo
+    echo "currently set on ${repo}:"
+    gh variable list --repo "${repo}" 2>/dev/null | grep -E '^APP_' || echo "  (no APP_ variables)"
+    gh secret list --repo "${repo}" 2>/dev/null | grep -E '^APP_' || echo "  (no APP_ secrets)"
+    exit 0
+fi
+
+gh variable set APP_CLIENT_ID --repo "${repo}" < "${work}/client_id"
+gh secret set APP_PRIVATE_KEY --repo "${repo}" < "${work}/pem_file"
+gh secret set APP_CLIENT_SECRET --repo "${repo}" < "${work}/client_secret"
+
+# Names only: GitHub never returns a secret value, so this confirms the write
+# landed without pretending to verify the contents.
+echo "synced to ${repo}:"
+gh variable list --repo "${repo}" | grep -E '^APP_' || true
+gh secret list --repo "${repo}" | grep -E '^APP_' || true
+'''
+shell = "bash -c"
+usage = '''
+flag "-v --verbose" help="Report the resolved repo, store path and per-field byte counts (never the values)"
+flag "--check" help="Report what would be pushed, and what is already set, without writing"
+flag "--store <store>" help="Path to the SOPS-encrypted store (default: ~/dotfiles/secrets/sops/secrets.enc.yaml)"
+'''
+
+# -- Branch Protection --
+[tasks."gh:branch:protect"]
+alias = ["bp"]
+description = "Apply branch protection rules to the default branch (force-push allowed for admins, required CI/Mise, require PR reviews). Pass --check to report the current rules without writing"
+hide = true
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Repo and branch are RESOLVED, not hardcoded. This read `repos/elioseverojunior/
+# comply/branches/main/protection` literally, so running it from a fork -- or
+# after a rename -- rewrote protection on the upstream repository instead of the
+# one checked out, silently and with admin rights. `gh:env:protect` resolves the
+# same way; keep them consistent.
+repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+branch="$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)"
+
+if [ "${usage_check:-false}" = true ]; then
+    echo "repo: ${repo}   default branch: ${branch}"
+    gh api "repos/${repo}/branches/${branch}/protection" \
+        -q '{required_status_checks: (.required_status_checks.contexts // []),
+             enforce_admins: .enforce_admins.enabled,
+             required_reviews: (.required_pull_request_reviews != null),
+             required_signatures: .required_signatures.enabled,
+             linear_history: .required_linear_history.enabled}' 2>/dev/null \
+        || echo "  no protection configured"
+    exit 0
+fi
+
+# Apply branch protection with admin bypass
+GH_PAGER= gh api -X PUT "repos/${repo}/branches/${branch}/protection" \
+  --input - << 'EOF'
+{
+    "required_status_checks": {
+        "strict": true,
+        "contexts": [
+            "CICD"
+        ]
+    },
+    "enforce_admins": false,
+    "required_pull_request_reviews": {
+        "dismiss_stale_reviews": true,
+        "require_code_owner_reviews": true,
+        "required_approving_review_count": 1
+    },
+    "required_signatures": true,
+    "required_linear_history": true,
+    "allow_force_pushes": true,
+    "allow_deletions": false,
+    "block_creations": false,
+    "required_conversation_resolution": true,
+    "lock_branch": false,
+    "allow_fork_syncing": false,
+    "restrictions": null
+}
+EOF
+
+echo "Branch protection applied to ${branch} on ${repo}"
+'''
+shell = "bash -c"
+usage = 'flag "--check" help="report the current rules without writing"'
+
+# -- Environment Protection --
+[tasks."gh:env:protect"]
+alias = ["ep"]
+description = "Apply deployment-environment protection to crates-io (required reviewer + protected branches) and github-pages (branch policy). Idempotent; pass --check to report drift without writing"
+hide = true
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Environment protection is the ONLY thing narrowing crates.io Trusted
+# Publishing. crates.io matches the OIDC `workflow_ref` claim, which for a
+# reusable workflow is the CALLER -- publish.yml runs as a called workflow, so
+# the registered filename is `cicd.yml` and the grant covers any job in it. The
+# `crates-io` environment is what brings that back to "a human approved this,
+# from a protected branch".
+repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+checking="${usage_check:-false}"
+
+# Resolved, not hardcoded, for the reason `gh:branch:protect` resolves its repo:
+# a literal login grants approval rights to the wrong account from a fork.
+reviewer_login="$(gh api user -q .login)"
+reviewer_id="$(gh api user -q .id)"
+
+# `prevent_self_review` stays FALSE deliberately. With a single reviewer it would
+# make every deployment unapprovable -- the one person who can approve is the one
+# who triggered it -- and publishing would block forever. Set it true only once a
+# second reviewer exists.
+crates_io=$(cat <<EOF
+{
+  "wait_timer": 0,
+  "prevent_self_review": false,
+  "reviewers": [{ "type": "User", "id": ${reviewer_id} }],
+  "deployment_branch_policy": { "protected_branches": true, "custom_branch_policies": false }
+}
+EOF
+)
+
+# github-pages gets a branch policy but NO required reviewer. The docs site
+# publishes on every release; an approval prompt there buys nothing and would
+# stall an otherwise unattended pipeline. `custom_branch_policies` rather than
+# `protected_branches` because `gh-pages` is a deploy target, not a protected
+# branch, and peaceiris/actions-gh-pages pushes to it directly.
+github_pages=$(cat <<'EOF'
+{
+  "wait_timer": 0,
+  "deployment_branch_policy": { "protected_branches": false, "custom_branch_policies": true }
+}
+EOF
+)
+
+show() {
+    gh api "repos/${repo}/environments/$1" \
+        -q '{name, rules: [.protection_rules[]?.type], branch_policy: .deployment_branch_policy}' 2>/dev/null \
+        || echo "  $1: does not exist"
+}
+
+if [ "$checking" = true ]; then
+    echo "repo: ${repo}   reviewer: ${reviewer_login} (${reviewer_id})"
+    for env in crates-io github-pages; do show "$env"; done
+    exit 0
+fi
+
+printf '%s' "${crates_io}" | GH_PAGER= gh api -X PUT "repos/${repo}/environments/crates-io" --input - >/dev/null
+echo "crates-io: required reviewer ${reviewer_login}, protected branches only"
+
+printf '%s' "${github_pages}" | GH_PAGER= gh api -X PUT "repos/${repo}/environments/github-pages" --input - >/dev/null
+# PUT resets custom branch policies, so they are re-declared here rather than
+# assumed to survive. `gh-pages` is the deploy branch; `main` is what dispatches.
+for branch in gh-pages main; do
+    GH_PAGER= gh api -X POST "repos/${repo}/environments/github-pages/deployment-branch-policies" \
+        -f "name=${branch}" -f "type=branch" >/dev/null 2>&1 || true
+done
+echo "github-pages: branch policy (gh-pages, main), no reviewer required"
+'''
+shell = "bash -c"
+usage = 'flag "--check" help="report the current rules without writing"'
+
+# === Git Data Submodule ===
+[tasks.data]
+alias = ["submodule", "data:init", "submodule:init"]
+description = "Populate data/ at the commit this repo pins (safe; no network if cached)"
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+if [ "${usage_verbose:-false}" = "true" ]; then
+  set -x
+fi
+
+# --init handles the fresh-clone case; --recursive costs nothing today and
+# keeps working if profile-data ever gains a submodule of its own.
+git submodule update --init --recursive data
+
+# A populated but empty directory is the failure this task exists to prevent,
+# and it is worth naming explicitly: the Python error it otherwise produces
+# points at profile.yml rather than at the checkout that never happened.
+if [ ! -f data/profile.yml ]; then
+  echo "data/profile.yml missing after checkout -- is the submodule URL reachable?" >&2
+  exit 1
+fi
+
+echo "data/ at $(git -C data rev-parse --short HEAD)"
+'''
+shell = "bash -c"
+usage = '''
+flag "-v --verbose" help="Trace each command as it runs"
+'''
+
+[tasks."data:update"]
+alias = ["data:pull", "submodule:update"]
+description = "Fast-forward data/ to the remote tip and stage the new pointer"
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+if [ "${usage_verbose:-false}" = "true" ]; then
+  set -x
+fi
+
+# --remote is the difference from `mise run data`: that one restores the pinned
+# commit, this one moves the pin forward. --merge keeps any local commits in
+# data/ rather than detaching past them.
+git submodule update --init --remote --merge data
+
+# --verify --quiet, not a bare rev-parse: given an unresolvable rev, plain
+# `git rev-parse HEAD:data` echoes the argument back on stdout *and* exits
+# non-zero, so a `|| echo none` fallback appends to it rather than replacing
+# it and the variable ends up holding the literal string "HEAD:data". That is
+# not hypothetical -- it is what this printed before the submodule was first
+# committed, when HEAD has no `data` entry to resolve.
+before="$(git rev-parse --verify --quiet HEAD:data || true)"
+after="$(git -C data rev-parse HEAD)"
+
+if [ "$before" = "$after" ]; then
+  echo "data/ already at $(git -C data rev-parse --short HEAD)"
+  exit 0
+fi
+
+# Staging the gitlink is the point: a submodule that has moved is invisible in
+# `git status -s` beyond a terse " M data", and an unstaged pointer means the
+# next clone silently gets the old record.
+git add data
+echo "data/ ${before:0:7}${before:+ }-> $(git -C data rev-parse --short HEAD) (pointer staged)"
+'''
+shell = "bash -c"
+usage = '''
+flag "-v --verbose" help="Trace each command as it runs"
+'''
+
+[tasks."data:reset"]
+alias = ["data:restore", "submodule:reset"]
+description = "Discard uncommitted edits in data/ and return to the pinned commit"
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+if [ "${usage_verbose:-false}" = "true" ]; then
+  set -x
+fi
+
+# Destructive, so it says what it is about to lose before doing it. `git
+# submodule update --force` alone would discard these silently.
+if [ -d data/.git ] || [ -f data/.git ]; then
+  dirty="$(git -C data status --porcelain)"
+  if [ -n "$dirty" ]; then
+    echo "discarding uncommitted changes in data/:"
+    printf '%s\n' "$dirty" | sed 's/^/  /'
+  fi
+fi
+
+git submodule update --init --force --checkout data
+git -C data clean -fd
+
+echo "data/ reset to $(git -C data rev-parse --short HEAD)"
+'''
+shell = "bash -c"
+usage = '''
+flag "-v --verbose" help="Trace each command as it runs"
+'''
+
+[tasks."data:recreate"]
+alias = ["data:reclone", "submodule:recreate"]
+description = "Delete and re-clone data/ from scratch (last resort for a broken checkout)"
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+if [ "${usage_verbose:-false}" = "true" ]; then
+  set -x
+fi
+
+# Unrecoverable for anything committed only inside data/ and never pushed, so
+# it refuses rather than guesses. --force is the escape hatch, named so that
+# typing it is a decision.
+if [ -d data/.git ] || [ -f data/.git ]; then
+  # `HEAD` is listed explicitly alongside `--branches`. A submodule checkout is
+  # detached by definition, so a commit made inside data/ belongs to no branch
+  # and `--branches --not --remotes` reports nothing -- the guard passed and ate
+  # the commit when tested exactly that way.
+  unpushed="$(git -C data log HEAD --branches --not --remotes --oneline 2>/dev/null || true)"
+  if [ -n "$unpushed" ] && [ "${usage_force:-false}" != "true" ]; then
+    echo "data/ has commits that exist nowhere else:" >&2
+    printf '%s\n' "$unpushed" | sed 's/^/  /' >&2
+    echo "push them from data/, or re-run with --force to destroy them." >&2
+    exit 1
+  fi
+fi
+
+# deinit unregisters the working tree; the .git/modules copy has to go too, or
+# the re-clone silently restores the same broken state it was meant to clear.
+git submodule deinit --force data || true
+rm -rf data
+rm -rf "$(git rev-parse --git-dir)/modules/data"
+git submodule update --init --recursive data
+
+echo "data/ re-cloned at $(git -C data rev-parse --short HEAD)"
+'''
+shell = "bash -c"
+usage = '''
+flag "-v --verbose" help="Trace each command as it runs"
+flag "-f --force" help="Destroy unpushed commits inside data/ instead of refusing"
+'''

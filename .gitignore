@@ -8,6 +8,13 @@
 .docusaurus
 .cache-loader
 
+# mise: mise.toml and mise.lock are committed, since they are what pin the
+# toolchain for everyone. mise.local.toml is machine-specific — `mise run
+# setup` regenerates it to step aside for whatever Homebrew already satisfies
+# at the pinned version — so committing it would impose one machine's
+# disable_tools list on every other.
+mise.local.toml
+
 # Misc
 .DS_Store
 .env.local
