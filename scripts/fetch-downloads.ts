@@ -4,7 +4,7 @@
  *
  *   bun run fetch:downloads
  *
- * The package list is read from `data/github-profile.yaml`, so publishing a new
+ * The package list is read from `data/profile.yml`, so publishing a new
  * crate or provider means editing that file and re-running this — never editing
  * the cache by hand.
  *
@@ -22,7 +22,7 @@ import path from "node:path";
 
 import { parse as parseYaml } from "yaml";
 
-import type { DownloadCache, GithubProfile } from "../src/types/github-profile";
+import type { DownloadCache, Profile } from "../src/types/profile";
 
 const DATA_DIR = path.join(import.meta.dirname, "..", "data");
 const CACHE_FILE = path.join(DATA_DIR, ".download-cache.json");
@@ -119,39 +119,52 @@ function loadCache(): DownloadCache {
   }
 }
 
-function collectTargets(profile: GithubProfile): Target[] {
-  const crates = profile.projects.crates.map((crate) => crate.name);
+function collectTargets(profile: Profile): Target[] {
+  const crateTargets: Target[] = [
+    ...new Set(
+      profile.projects
+        .filter((project) => project.kind === "crate")
+        .map((crate) => crate.name),
+    ),
+  ].map((name) => ({
+    key: `crate:${name}`,
+    url: `https://crates.io/api/v1/crates/${name}`,
+    read: readCrate,
+  }));
 
-  // Packages under `recent` are excluded from the site's downloads table, but
-  // their figures are still fetched: the data belongs in the cache even when
-  // the design chooses not to measure a just-published package on it.
-  const recentCrates = (profile.projects.recent ?? []).flatMap(
-    (entry) => entry.crates ?? [],
-  );
-
-  const crateTargets: Target[] = [...new Set([...crates, ...recentCrates])].map(
-    (name) => ({
-      key: `crate:${name}`,
-      url: `https://crates.io/api/v1/crates/${name}`,
-      read: readCrate,
-    }),
-  );
-
-  const providerTargets: Target[] = profile.projects.terraform_providers.map(
-    (provider) => ({
-      key: `provider:${provider.namespace}/${provider.name}`,
-      url: `https://registry.terraform.io/v1/providers/${provider.namespace}/${provider.name}`,
-      read: readProvider,
-    }),
-  );
+  // The record stores each provider's registry URL rather than its namespace
+  // and name as separate fields, so both are read back out of it:
+  //   https://registry.terraform.io/providers/<ns>/<name>/latest/docs
+  // A URL that does not match is skipped rather than guessed at — a wrong key
+  // would attach one provider's downloads to another.
+  const providerTargets: Target[] = profile.projects
+    .filter((project) => project.kind === "terraform-provider")
+    .flatMap((provider) => {
+      const parts = /\/providers\/([^/]+)\/([^/]+)/.exec(provider.url);
+      const namespace = parts?.[1];
+      const name = parts?.[2];
+      if (namespace === undefined || name === undefined) {
+        console.warn(
+          `Skipping ${provider.id}: no namespace/name in "${provider.url}"`,
+        );
+        return [];
+      }
+      return [
+        {
+          key: `provider:${namespace}/${name}`,
+          url: `https://registry.terraform.io/v1/providers/${namespace}/${name}`,
+          read: readProvider,
+        },
+      ];
+    });
 
   return [...crateTargets, ...providerTargets];
 }
 
 async function main(): Promise<void> {
   const profile = parseYaml(
-    fs.readFileSync(path.join(DATA_DIR, "github-profile.yaml"), "utf8"),
-  ) as GithubProfile;
+    fs.readFileSync(path.join(DATA_DIR, "profile.yml"), "utf8"),
+  ) as Profile;
 
   const targets = collectTargets(profile);
   const previous = loadCache();
