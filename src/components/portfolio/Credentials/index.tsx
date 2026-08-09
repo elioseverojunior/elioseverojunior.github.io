@@ -50,7 +50,15 @@ export function Credentials({
                 {entry.degree} · {entry.field}
               </h3>
               <p className={styles.institution}>{entry.institution}</p>
-              <p className={clsx("els-label", styles.year)}>{entry.year}</p>
+              {/*
+                A course in progress has no completion year, so the year slot
+                says what is true instead of rendering an empty styled line —
+                which is what a bare {entry.year} produced for the PUC-SP
+                specialization.
+              */}
+              <p className={clsx("els-label", styles.year)}>
+                {entry.year ?? "In progress"}
+              </p>
             </div>
           ))}
         </div>
