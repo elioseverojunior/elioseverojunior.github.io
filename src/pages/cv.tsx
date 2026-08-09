@@ -1,15 +1,15 @@
-import type {ReactNode} from 'react';
-import Layout from '@theme/Layout';
-import clsx from 'clsx';
-import {useRecord} from '@site/src/data/site';
-import {useReveal} from '@site/src/hooks/useReveal';
-import {Contact} from '@site/src/components/portfolio/Contact';
-import {Credentials} from '@site/src/components/portfolio/Credentials';
-import {History} from '@site/src/components/portfolio/History';
-import {Impact} from '@site/src/components/portfolio/Impact';
-import {Shipped} from '@site/src/components/portfolio/Shipped';
-import {Stack} from '@site/src/components/portfolio/Stack';
-import styles from './cv.module.css';
+import { Contact } from "@site/src/components/portfolio/Contact";
+import { Credentials } from "@site/src/components/portfolio/Credentials";
+import { History } from "@site/src/components/portfolio/History";
+import { Impact } from "@site/src/components/portfolio/Impact";
+import { Shipped } from "@site/src/components/portfolio/Shipped";
+import { Stack } from "@site/src/components/portfolio/Stack";
+import { useRecord } from "@site/src/data/site";
+import { useReveal } from "@site/src/hooks/useReveal";
+import Layout from "@theme/Layout";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./cv.module.css";
 
 /**
  * The long form of the same career.
@@ -32,7 +32,7 @@ export default function Cv(): ReactNode {
     >
       <header className={styles.masthead}>
         <div className="els-shell">
-          <p className={clsx('els-label', styles.label)}>
+          <p className={clsx("els-label", styles.label)}>
             Curriculum vitae · {profile.startYear}–present
           </p>
           <h1 className={styles.name}>{profile.name}</h1>
@@ -59,7 +59,7 @@ export default function Cv(): ReactNode {
             <div className={styles.metaItem}>
               <dt className="els-label">Languages</dt>
               <dd className={styles.metaValue}>
-                {profile.languages.join(' · ')}
+                {profile.languages.join(" · ")}
               </dd>
             </div>
           </dl>

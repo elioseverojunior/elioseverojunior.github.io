@@ -18,7 +18,7 @@
     var(--els-line) 70%,
     transparent
   );
-  content: '';
+  content: "";
 }
 
 .entry {
@@ -133,7 +133,7 @@
   height: 7px;
   background: var(--els-ink-900);
   border: 1px solid var(--els-line-hot);
-  content: '';
+  content: "";
   transform: rotate(45deg);
 }
 
@@ -187,7 +187,7 @@
   width: 5px;
   height: 5px;
   background: var(--els-amber);
-  content: '';
+  content: "";
   opacity: 0.85;
   transform: rotate(45deg);
 }

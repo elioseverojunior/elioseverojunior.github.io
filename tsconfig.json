@@ -47,8 +47,8 @@
     "paths": {
       "@site/*": ["./*"]
     },
-    
-    "types": ["bun", "node"],
+
+    "types": ["bun", "node"]
   },
   "exclude": [".docusaurus", "build"]
 }

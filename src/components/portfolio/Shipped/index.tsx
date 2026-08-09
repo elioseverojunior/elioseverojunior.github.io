@@ -1,15 +1,15 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import {Counter} from '@site/src/components/portfolio/Counter';
-import {Section} from '@site/src/components/portfolio/Section';
-import {formatCount} from '@site/src/data/format';
-import type {SiteMetric, SiteProfile} from '@site/src/types/site';
-import styles from './styles.module.css';
+import { Counter } from "@site/src/components/portfolio/Counter";
+import { Section } from "@site/src/components/portfolio/Section";
+import { formatCount } from "@site/src/data/format";
+import type { SiteMetric, SiteProfile } from "@site/src/types/site";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 /** `https://crates.io/crates/rust-yaml` -> `crates.io`. */
 function hostOf(url: string): string {
   try {
-    return new URL(url).hostname.replace(/^www\./, '');
+    return new URL(url).hostname.replace(/^www\./, "");
   } catch {
     return url;
   }
@@ -27,18 +27,22 @@ function hostOf(url: string): string {
  * operate with a keyboard and hard to reflow on a narrow screen. The columns
  * are aligned with grid so it still reads as a table.
  */
-export function Shipped({profile}: {readonly profile: SiteProfile}): ReactNode {
+export function Shipped({
+  profile,
+}: {
+  readonly profile: SiteProfile;
+}): ReactNode {
   const measured = profile.projects.filter(
     (project) => project.downloads !== undefined,
   );
 
   const total: SiteMetric = {
-    id: 'downloads-total',
+    id: "downloads-total",
     display: formatCount(profile.downloadsTotal),
     value: profile.downloadsTotal,
-    prefix: '',
-    suffix: '',
-    label: 'registry downloads',
+    prefix: "",
+    suffix: "",
+    label: "registry downloads",
   };
 
   return (
@@ -54,7 +58,7 @@ export function Shipped({profile}: {readonly profile: SiteProfile}): ReactNode {
       intro="Infrastructure tooling on crates.io and the Terraform Registry, authored and maintained across two accounts. Every row below links to a public package page."
     >
       {profile.downloadsTotal > 0 && (
-        <div className={clsx('els-panel', styles.total)} data-reveal>
+        <div className={clsx("els-panel", styles.total)} data-reveal>
           <Counter className={styles.totalValue} grouped metric={total} />
           <p className={styles.totalLabel}>
             registry downloads across {measured.length} published packages
@@ -63,7 +67,7 @@ export function Shipped({profile}: {readonly profile: SiteProfile}): ReactNode {
       )}
 
       <ul className={styles.table} data-reveal>
-        <li className={clsx('els-label', styles.head)} aria-hidden="true">
+        <li className={clsx("els-label", styles.head)} aria-hidden="true">
           <span>Package</span>
           <span>Kind</span>
           <span className={styles.numeric}>Downloads</span>
@@ -109,7 +113,7 @@ export function Shipped({profile}: {readonly profile: SiteProfile}): ReactNode {
       */}
       {profile.recentProjects.length > 0 && (
         <div className={styles.recent} data-reveal>
-          <p className={clsx('els-label', styles.recentLabel)}>
+          <p className={clsx("els-label", styles.recentLabel)}>
             Recently shipped · too new to measure
           </p>
           <ul className={styles.recentList}>

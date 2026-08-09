@@ -1,8 +1,8 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import {Section} from '@site/src/components/portfolio/Section';
-import type {SiteCertification, SiteProfile} from '@site/src/types/site';
-import styles from './styles.module.css';
+import { Section } from "@site/src/components/portfolio/Section";
+import type { SiteCertification, SiteProfile } from "@site/src/types/site";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 /** Certifications keyed by issuer, preserving first-seen issuer order. */
 function byIssuer(
@@ -40,7 +40,7 @@ export function Credentials({
     >
       <div className={styles.layout}>
         <div className={styles.education} data-reveal>
-          <p className={clsx('els-label', styles.blockLabel)}>Education</p>
+          <p className={clsx("els-label", styles.blockLabel)}>Education</p>
           {profile.education.map((entry) => (
             <div
               className={styles.degree}
@@ -50,13 +50,13 @@ export function Credentials({
                 {entry.degree} · {entry.field}
               </h3>
               <p className={styles.institution}>{entry.institution}</p>
-              <p className={clsx('els-label', styles.year)}>{entry.year}</p>
+              <p className={clsx("els-label", styles.year)}>{entry.year}</p>
             </div>
           ))}
         </div>
 
         <div className={styles.certifications} data-reveal>
-          <p className={clsx('els-label', styles.blockLabel)}>
+          <p className={clsx("els-label", styles.blockLabel)}>
             Certifications · {profile.certifications.length}
           </p>
           <div className={styles.issuers}>

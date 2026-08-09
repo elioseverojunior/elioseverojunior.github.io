@@ -7,18 +7,18 @@
  */
 
 const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ] as const;
 
 export interface YearMonth {
@@ -28,13 +28,13 @@ export interface YearMonth {
 
 /** Parses `YYYY-MM`. Returns null for anything else, including `present`. */
 export function parseYearMonth(value: string): YearMonth | null {
-  const [rawYear, rawMonth] = value.split('-');
+  const [rawYear, rawMonth] = value.split("-");
   if (rawYear === undefined || rawMonth === undefined) {
     return null;
   }
   const year = Number.parseInt(rawYear, 10);
   const month = Number.parseInt(rawMonth, 10);
-  return Number.isNaN(year) || Number.isNaN(month) ? null : {year, month};
+  return Number.isNaN(year) || Number.isNaN(month) ? null : { year, month };
 }
 
 /** `2024-10` -> `Oct 2024`; unparseable input is passed through untouched. */
@@ -56,7 +56,7 @@ export function formatMonth(value: string): string {
  */
 export function formatPeriod(start: string, end: string | null): string {
   const from = formatMonth(start);
-  if (end === null || end === 'present') {
+  if (end === null || end === "present") {
     return `${from} — Present`;
   }
   return `${from} — ${formatMonth(end)}`;
@@ -68,8 +68,8 @@ function monthsBetween(start: string, end: string | null, now: Date): number {
     return 0;
   }
   const to =
-    end === null || end === 'present'
-      ? {year: now.getFullYear(), month: now.getMonth() + 1}
+    end === null || end === "present"
+      ? { year: now.getFullYear(), month: now.getMonth() + 1 }
       : parseYearMonth(end);
   if (to === null) {
     return 0;
@@ -88,12 +88,12 @@ export function formatDuration(
   const months = total % 12;
   const parts: string[] = [];
   if (years > 0) {
-    parts.push(`${years} yr${years === 1 ? '' : 's'}`);
+    parts.push(`${years} yr${years === 1 ? "" : "s"}`);
   }
   if (months > 0) {
-    parts.push(`${months} mo${months === 1 ? '' : 's'}`);
+    parts.push(`${months} mo${months === 1 ? "" : "s"}`);
   }
-  return parts.length === 0 ? '1 mo' : parts.join(' ');
+  return parts.length === 0 ? "1 mo" : parts.join(" ");
 }
 
 export interface ParsedMetric {
@@ -116,10 +116,10 @@ export interface ParsedMetric {
 export function parseMetric(display: string): ParsedMetric {
   const match = /^(\D*)(\d+(?:[.,]\d+)?)(.*)$/.exec(display.trim());
   if (match === null) {
-    return {value: null, prefix: '', suffix: ''};
+    return { value: null, prefix: "", suffix: "" };
   }
-  const [, prefix = '', digits = '', suffix = ''] = match;
-  const value = Number.parseFloat(digits.replace(',', '.'));
+  const [, prefix = "", digits = "", suffix = ""] = match;
+  const value = Number.parseFloat(digits.replace(",", "."));
   return {
     value: Number.isNaN(value) ? null : value,
     prefix,
@@ -133,10 +133,10 @@ export function parseMetric(display: string): ParsedMetric {
  * applied at render time rather than edited into the sources.
  */
 export function prose(text: string): string {
-  return text.replace(/\s--\s/g, ' — ');
+  return text.replace(/\s--\s/g, " — ");
 }
 
 /** `26343` -> `26,343`. Fixed locale so SSR and client agree exactly. */
 export function formatCount(value: number): string {
-  return value.toLocaleString('en-US');
+  return value.toLocaleString("en-US");
 }

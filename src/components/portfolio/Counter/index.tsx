@@ -1,7 +1,7 @@
-import type {ReactNode} from 'react';
-import {formatCount} from '@site/src/data/format';
-import {useCountUp} from '@site/src/hooks/useCountUp';
-import type {SiteMetric} from '@site/src/types/site';
+import { formatCount } from "@site/src/data/format";
+import { useCountUp } from "@site/src/hooks/useCountUp";
+import type { SiteMetric } from "@site/src/types/site";
+import type { ReactNode } from "react";
 
 export interface CounterProps {
   readonly metric: SiteMetric;
@@ -24,7 +24,7 @@ export function Counter({
   grouped = false,
 }: CounterProps): ReactNode {
   // Called unconditionally — the early return below must not sit above a hook.
-  const {ref, value} = useCountUp(metric.value ?? 0);
+  const { ref, value } = useCountUp(metric.value ?? 0);
 
   if (metric.value === null) {
     return <span className={className}>{metric.display}</span>;

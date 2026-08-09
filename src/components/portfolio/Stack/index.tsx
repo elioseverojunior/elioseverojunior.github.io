@@ -1,12 +1,12 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import {Section} from '@site/src/components/portfolio/Section';
-import type {SiteProfile, SiteSkill} from '@site/src/types/site';
-import styles from './styles.module.css';
+import { Section } from "@site/src/components/portfolio/Section";
+import type { SiteProfile, SiteSkill } from "@site/src/types/site";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 const SEGMENTS = [1, 2, 3, 4, 5] as const;
 
-function Depth({skill}: {readonly skill: SiteSkill}): ReactNode {
+function Depth({ skill }: { readonly skill: SiteSkill }): ReactNode {
   const level = skill.level;
   if (level === undefined) {
     return null;
@@ -39,7 +39,11 @@ function Depth({skill}: {readonly skill: SiteSkill}): ReactNode {
  * bars mean something specific rather than implying a ranking the record never
  * claimed. Tools the record carries no rating for simply show no bar.
  */
-export function Stack({profile}: {readonly profile: SiteProfile}): ReactNode {
+export function Stack({
+  profile,
+}: {
+  readonly profile: SiteProfile;
+}): ReactNode {
   return (
     <Section
       id="stack"
@@ -52,7 +56,7 @@ export function Stack({profile}: {readonly profile: SiteProfile}): ReactNode {
       }
       intro={`${profile.skillCount} tools, rated for depth rather than exposure. Amber marks the ones this career is built around.`}
     >
-      <p className={clsx('els-label', styles.legend)}>
+      <p className={clsx("els-label", styles.legend)}>
         <span className={styles.legendKey} aria-hidden="true">
           <span className={clsx(styles.segment, styles.segmentOn)} />
           <span className={clsx(styles.segment, styles.segmentOn)} />
@@ -66,7 +70,7 @@ export function Stack({profile}: {readonly profile: SiteProfile}): ReactNode {
       <div className={styles.groups}>
         {profile.skillGroups.map((group) => (
           <section
-            className={clsx('els-panel', styles.group)}
+            className={clsx("els-panel", styles.group)}
             data-reveal
             key={group.id}
           >

@@ -1,18 +1,22 @@
-import type {ReactNode} from 'react';
-import Link from '@docusaurus/Link';
-import clsx from 'clsx';
-import {Counter} from '@site/src/components/portfolio/Counter';
-import type {SiteProfile} from '@site/src/types/site';
-import styles from './styles.module.css';
+import Link from "@docusaurus/Link";
+import { Counter } from "@site/src/components/portfolio/Counter";
+import type { SiteProfile } from "@site/src/types/site";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 /** `Elio Severo Junior` -> `["Elio Severo", "Junior"]`. */
 function splitName(name: string): readonly [string, string] {
   const parts = name.trim().split(/\s+/);
   const last = parts.pop();
-  return last === undefined ? [name, ''] : [parts.join(' '), last];
+  return last === undefined ? [name, ""] : [parts.join(" "), last];
 }
 
-export function Hero({profile}: {readonly profile: SiteProfile}): ReactNode {
+export function Hero({
+  profile,
+}: {
+  readonly profile: SiteProfile;
+}): ReactNode {
   const [firstNames, lastName] = splitName(profile.name);
   const role = profile.currentRole;
   // Two readouts: enough to prove the claim, few enough to stay a hero.
@@ -20,7 +24,8 @@ export function Hero({profile}: {readonly profile: SiteProfile}): ReactNode {
   const core = profile.skillGroups
     .flatMap((group) => group.skills)
     .filter((skill) => skill.core);
-  const ticker = core.length > 0 ? core : profile.skillGroups[0]?.skills ?? [];
+  const ticker =
+    core.length > 0 ? core : (profile.skillGroups[0]?.skills ?? []);
 
   return (
     <header className={styles.hero}>
@@ -30,16 +35,16 @@ export function Hero({profile}: {readonly profile: SiteProfile}): ReactNode {
         {profile.acronym}
       </span>
 
-      <div className={clsx('els-shell', styles.shell)}>
+      <div className={clsx("els-shell", styles.shell)}>
         <div className={styles.grid}>
           <div className={styles.lead}>
-            <p className={clsx('els-label', styles.status)}>
+            <p className={clsx("els-label", styles.status)}>
               <span className={styles.beacon} aria-hidden="true" />
               In production since {profile.startYear}
               <span className={styles.divider}>/</span>
               {profile.location}
               <span className={styles.divider}>/</span>
-              {profile.languages.join(' · ')}
+              {profile.languages.join(" · ")}
             </p>
 
             <h1 className={styles.name}>
@@ -72,14 +77,16 @@ export function Hero({profile}: {readonly profile: SiteProfile}): ReactNode {
             </div>
           </div>
 
-          <aside className={clsx('els-panel', styles.panel)}>
-            <p className={clsx('els-label', styles.panelLabel)}>
+          <aside className={clsx("els-panel", styles.panel)}>
+            <p className={clsx("els-label", styles.panelLabel)}>
               Current deployment
             </p>
             <p className={styles.panelEmployer}>
               {role?.company ?? profile.name}
             </p>
-            <p className={styles.panelTitle}>{role?.title ?? profile.headline}</p>
+            <p className={styles.panelTitle}>
+              {role?.title ?? profile.headline}
+            </p>
             {role !== undefined && (
               <p className={styles.panelMeta}>
                 {role.period}

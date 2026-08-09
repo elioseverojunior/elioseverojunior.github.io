@@ -1,6 +1,6 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import styles from './styles.module.css';
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 export interface SectionProps {
   /** Anchor target, referenced by the navbar. */
@@ -32,7 +32,7 @@ export function Section({
         <header className={styles.header} data-reveal>
           <div className={styles.marker}>
             <span className={styles.index}>{index}</span>
-            <span className={clsx('els-label', styles.label)}>{label}</span>
+            <span className={clsx("els-label", styles.label)}>{label}</span>
             <span className={styles.rule} aria-hidden="true" />
           </div>
           <h2 className={styles.title}>{title}</h2>

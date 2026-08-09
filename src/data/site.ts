@@ -1,5 +1,6 @@
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import type {SiteData, SiteProfile} from '@site/src/types/site';
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+
+import type { SiteData, SiteProfile } from "@site/src/types/site";
 
 /**
  * Reads the view model that docusaurus.config.ts built at config time.
@@ -9,7 +10,7 @@ import type {SiteData, SiteProfile} from '@site/src/types/site';
  * at every call site.
  */
 export function useSite(): SiteData {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return siteConfig.customFields?.site as SiteData;
 }
 

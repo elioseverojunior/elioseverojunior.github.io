@@ -13,16 +13,16 @@
 
 /** Skill category, as used by the `kind` key. */
 export type SkillKind =
-  | 'cloud'
-  | 'container'
-  | 'iac'
-  | 'cicd'
-  | 'observability'
-  | 'language'
-  | 'framework'
-  | 'database'
-  | 'storage'
-  | 'methodology';
+  | "cloud"
+  | "container"
+  | "iac"
+  | "cicd"
+  | "observability"
+  | "language"
+  | "framework"
+  | "database"
+  | "storage"
+  | "methodology";
 
 /**
  * Self-assessed depth, 1-5. Per profile.yaml: 5 = daily working tool, owned

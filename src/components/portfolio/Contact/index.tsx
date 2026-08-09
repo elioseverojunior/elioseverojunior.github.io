@@ -1,7 +1,7 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import type {SiteProfile} from '@site/src/types/site';
-import styles from './styles.module.css';
+import type { SiteProfile } from "@site/src/types/site";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 /**
  * Closing block. It deliberately breaks the numbered-section rhythm used above
@@ -12,12 +12,16 @@ import styles from './styles.module.css';
  * drop it before the view model is built. This page is public and permanently
  * indexed, and email plus LinkedIn is the reachable surface a recruiter needs.
  */
-export function Contact({profile}: {readonly profile: SiteProfile}): ReactNode {
+export function Contact({
+  profile,
+}: {
+  readonly profile: SiteProfile;
+}): ReactNode {
   return (
     <section className={styles.contact} id="contact">
-      <div className={clsx('els-shell', styles.shell)}>
+      <div className={clsx("els-shell", styles.shell)}>
         <div className={styles.inner} data-reveal>
-          <p className={clsx('els-label', styles.label)}>Contact</p>
+          <p className={clsx("els-label", styles.label)}>Contact</p>
 
           <h2 className={styles.headline}>
             Let&apos;s build something that <em>stays up</em>
@@ -37,7 +41,7 @@ export function Contact({profile}: {readonly profile: SiteProfile}): ReactNode {
                   rel="noopener noreferrer me"
                   target="_blank"
                 >
-                  <span className={clsx('els-label', styles.linkName)}>
+                  <span className={clsx("els-label", styles.linkName)}>
                     {link.name}
                   </span>
                   <span className={styles.linkHandle}>{link.handle}</span>
@@ -57,7 +61,7 @@ export function Contact({profile}: {readonly profile: SiteProfile}): ReactNode {
             <div className={styles.fact}>
               <dt className="els-label">Languages</dt>
               <dd className={styles.factValue}>
-                {profile.languages.join(' · ')}
+                {profile.languages.join(" · ")}
               </dd>
             </div>
           </dl>

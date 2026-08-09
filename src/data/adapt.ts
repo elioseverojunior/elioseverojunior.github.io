@@ -1,14 +1,7 @@
-import {
-  formatDuration,
-  formatPeriod,
-  parseMetric,
-  parseYearMonth,
-  prose,
-} from './format';
 // Relative, not `@site/*`: this module is imported by docusaurus.config.ts and
 // evaluated in plain Node, where the `@site` alias does not exist.
-import type {DownloadCache, GithubProfile} from '../types/github-profile';
-import type {Profile, Skill, SkillKind} from '../types/profile';
+import type { DownloadCache, GithubProfile } from "../types/github-profile";
+import type { Profile, Skill, SkillKind } from "../types/profile";
 import type {
   SiteCertification,
   SiteLink,
@@ -18,7 +11,15 @@ import type {
   SiteRole,
   SiteSkill,
   SiteSkillGroup,
-} from '../types/site';
+} from "../types/site";
+
+import {
+  formatDuration,
+  formatPeriod,
+  parseMetric,
+  parseYearMonth,
+  prose,
+} from "./format";
 
 /* ==========================================================================
    Shared helpers
@@ -33,12 +34,12 @@ import type {
 function normalizeSkillName(name: string): string {
   return name
     .toLowerCase()
-    .replace(/^(aws|amazon|hashicorp|apache)\s+/, '')
-    .replace(/[^a-z0-9+#]/g, '');
+    .replace(/^(aws|amazon|hashicorp|apache)\s+/, "")
+    .replace(/[^a-z0-9+#]/g, "");
 }
 
 function toSiteSkill(skill: Skill): SiteSkill {
-  return {name: skill.name, level: skill.level, core: skill.prominence === 1};
+  return { name: skill.name, level: skill.level, core: skill.prominence === 1 };
 }
 
 function crateUrl(name: string): string {
@@ -50,7 +51,10 @@ function providerUrl(namespace: string, name: string): string {
 }
 
 function sumDownloads(projects: readonly SiteProject[]): number {
-  return projects.reduce((total, project) => total + (project.downloads ?? 0), 0);
+  return projects.reduce(
+    (total, project) => total + (project.downloads ?? 0),
+    0,
+  );
 }
 
 function earliestYear(starts: readonly string[], fallback: number): number {
@@ -64,9 +68,9 @@ function earliestYear(starts: readonly string[], fallback: number): number {
 function handleOf(url: string): string {
   try {
     const parsed = new URL(url);
-    return parsed.pathname === '/'
+    return parsed.pathname === "/"
       ? parsed.hostname
-      : parsed.pathname.replace(/\/$/, '');
+      : parsed.pathname.replace(/\/$/, "");
   } catch {
     return url;
   }
@@ -86,11 +90,11 @@ function applyTokens(text: string, years: number): string {
 }
 
 const LINK_LABELS: Readonly<Record<string, string>> = {
-  github: 'GitHub',
-  github_org: 'GitHub',
-  linkedin: 'LinkedIn',
-  stackoverflow: 'Stack Overflow',
-  readthedocs: 'Read the Docs',
+  github: "GitHub",
+  github_org: "GitHub",
+  linkedin: "LinkedIn",
+  stackoverflow: "Stack Overflow",
+  readthedocs: "Read the Docs",
 };
 
 /* ==========================================================================
@@ -113,7 +117,7 @@ interface RawTenure {
 }
 
 function isOpen(end: string | null): boolean {
-  return end === null || end === 'present';
+  return end === null || end === "present";
 }
 
 /**
@@ -203,20 +207,18 @@ export function adaptLanding(
   );
 
   const roles = groupByEmployer(
-    gh.experience.map(
-      (entry, index): RawTenure => ({
-        id: `${entry.company}-${entry.start}-${index}`,
-        company: entry.company,
-        industry: industryByEmployer.get(entry.company.toLowerCase()),
-        title: entry.title,
-        start: entry.start,
-        end: entry.end,
-        featured: entry.featured,
-        bullets: entry.bullets.map(prose),
-        tech: [],
-        metrics: [],
-      }),
-    ),
+    gh.experience.map((entry, index): RawTenure => ({
+      id: `${entry.company}-${entry.start}-${index}`,
+      company: entry.company,
+      industry: industryByEmployer.get(entry.company.toLowerCase()),
+      title: entry.title,
+      start: entry.start,
+      end: entry.end,
+      featured: entry.featured,
+      bullets: entry.bullets.map(prose),
+      tech: [],
+      metrics: [],
+    })),
     now,
   );
 
@@ -235,11 +237,11 @@ export function adaptLanding(
 
   const skillGroups: SiteSkillGroup[] = gh.skill_order
     .map((label) => ({
-      id: label.toLowerCase().replace(/\s+/g, '-'),
+      id: label.toLowerCase().replace(/\s+/g, "-"),
       label,
       skills: (gh.skills[label] ?? []).map((name) => {
         const known = depthByName.get(normalizeSkillName(name));
-        return {name, level: known?.level, core: known?.prominence === 1};
+        return { name, level: known?.level, core: known?.prominence === 1 };
       }),
     }))
     .filter((group) => group.skills.length > 0);
@@ -247,7 +249,7 @@ export function adaptLanding(
   const crates: SiteProject[] = gh.projects.crates.map((crate) => ({
     id: `crate-${crate.name}`,
     name: crate.name,
-    kind: 'Rust crate',
+    kind: "Rust crate",
     summary: crate.summary,
     url: crateUrl(crate.name),
     repo: crate.repo,
@@ -258,7 +260,7 @@ export function adaptLanding(
     (provider) => ({
       id: `provider-${provider.namespace}-${provider.name}`,
       name: provider.name,
-      kind: 'Terraform provider',
+      kind: "Terraform provider",
       summary: provider.summary,
       url: providerUrl(provider.namespace, provider.name),
       repo: provider.repo,
@@ -275,7 +277,7 @@ export function adaptLanding(
   const links: SiteLink[] = Object.entries(gh.links)
     // `site` is this page; linking a visitor back to where they already are is
     // noise, so it is dropped rather than rendered.
-    .filter(([key]) => key !== 'site')
+    .filter(([key]) => key !== "site")
     .map(([key, url]) => ({
       name: LINK_LABELS[key] ?? key,
       handle: handleOf(url),
@@ -324,14 +326,12 @@ export function adaptLanding(
       institution: entry.institution,
       year: entry.year,
     })),
-    certifications: gh.certifications.map(
-      (entry): SiteCertification => ({
-        name: entry.name,
-        // The source leaves one issuer blank; rendering an empty heading would
-        // look like a bug, so it is labelled honestly instead.
-        issuer: entry.issuer === '' ? 'Independent' : entry.issuer,
-      }),
-    ),
+    certifications: gh.certifications.map((entry): SiteCertification => ({
+      name: entry.name,
+      // The source leaves one issuer blank; rendering an empty heading would
+      // look like a bug, so it is labelled honestly instead.
+      issuer: entry.issuer === "" ? "Independent" : entry.issuer,
+    })),
   };
 }
 
@@ -340,29 +340,29 @@ export function adaptLanding(
    ========================================================================== */
 
 const KIND_ORDER: readonly SkillKind[] = [
-  'cloud',
-  'container',
-  'iac',
-  'cicd',
-  'observability',
-  'language',
-  'database',
-  'storage',
-  'framework',
-  'methodology',
+  "cloud",
+  "container",
+  "iac",
+  "cicd",
+  "observability",
+  "language",
+  "database",
+  "storage",
+  "framework",
+  "methodology",
 ];
 
 const KIND_LABELS: Readonly<Record<SkillKind, string>> = {
-  cloud: 'Cloud Platforms',
-  container: 'Containers & Orchestration',
-  iac: 'Infrastructure as Code',
-  cicd: 'Delivery & CI/CD',
-  observability: 'Observability',
-  language: 'Languages',
-  database: 'Data & Databases',
-  storage: 'Storage & Messaging',
-  framework: 'Frameworks',
-  methodology: 'Ways of Working',
+  cloud: "Cloud Platforms",
+  container: "Containers & Orchestration",
+  iac: "Infrastructure as Code",
+  cicd: "Delivery & CI/CD",
+  observability: "Observability",
+  language: "Languages",
+  database: "Data & Databases",
+  storage: "Storage & Messaging",
+  framework: "Frameworks",
+  methodology: "Ways of Working",
 };
 
 /** Builds the long-form view from `profile.yaml` — every role, every skill. */
@@ -374,37 +374,35 @@ export function adaptRecord(
   const byId = new Map(record.skills.map((skill) => [skill.id, skill]));
 
   const roles = groupByEmployer(
-    record.experience.map(
-      (role): RawTenure => ({
-        id: role.id,
-        company: role.employer,
-        industry: role.industry,
-        title: role.titles.join(' · '),
-        start: role.start,
-        end: role.end,
-        // The record carries no editorial flag; /cv expands everything anyway.
-        featured: true,
-        bullets: [],
-        tech: role.tech
-          .map((id) => byId.get(id))
-          .filter((skill): skill is Skill => skill !== undefined)
-          .map(toSiteSkill),
-        metrics: role.metrics.map((metric) => {
-          const display = `${metric.value}${metric.unit === 'percent' ? '%' : ''}`;
-          const parsed = parseMetric(display);
-          return {
-            id: `${role.id}-${metric.id}`,
-            display,
-            value: parsed.value,
-            prefix: parsed.prefix,
-            suffix: parsed.suffix,
-            label: metric.unit === 'percent' ? '' : metric.unit,
-            detail: prose(metric.claim),
-            source: role.employer,
-          };
-        }),
+    record.experience.map((role): RawTenure => ({
+      id: role.id,
+      company: role.employer,
+      industry: role.industry,
+      title: role.titles.join(" · "),
+      start: role.start,
+      end: role.end,
+      // The record carries no editorial flag; /cv expands everything anyway.
+      featured: true,
+      bullets: [],
+      tech: role.tech
+        .map((id) => byId.get(id))
+        .filter((skill): skill is Skill => skill !== undefined)
+        .map(toSiteSkill),
+      metrics: role.metrics.map((metric) => {
+        const display = `${metric.value}${metric.unit === "percent" ? "%" : ""}`;
+        const parsed = parseMetric(display);
+        return {
+          id: `${role.id}-${metric.id}`,
+          display,
+          value: parsed.value,
+          prefix: parsed.prefix,
+          suffix: parsed.suffix,
+          label: metric.unit === "percent" ? "" : metric.unit,
+          detail: prose(metric.claim),
+          source: role.employer,
+        };
       }),
-    ),
+    })),
     now,
   );
 
@@ -424,18 +422,18 @@ export function adaptRecord(
 
   const projects: SiteProject[] = record.projects
     .map((project) => {
-      const isCrate = project.kind === 'crate';
+      const isCrate = project.kind === "crate";
       // Registry namespace is not a field in the record; it is recoverable
       // from the published URL, which is transcribed there verbatim.
       const namespace = /providers\/([^/]+)\//.exec(project.url)?.[1];
       const registryName = /providers\/[^/]+\/([^/]+)/.exec(project.url)?.[1];
       const key = isCrate
         ? `crate:${project.name}`
-        : `provider:${namespace ?? ''}/${registryName ?? ''}`;
+        : `provider:${namespace ?? ""}/${registryName ?? ""}`;
       return {
         id: project.id,
         name: project.name,
-        kind: isCrate ? 'Rust crate' : 'Terraform provider',
+        kind: isCrate ? "Rust crate" : "Terraform provider",
         summary: prose(project.summary),
         url: project.url,
         downloads: downloads[key],
@@ -451,9 +449,9 @@ export function adaptRecord(
   return {
     name: record.person.name,
     acronym: record.person.acronym,
-    headline: 'Senior SRE & Cloud Engineer',
-    tagline: '',
-    summary: '',
+    headline: "Senior SRE & Cloud Engineer",
+    tagline: "",
+    summary: "",
     location: record.person.location,
     email: record.person.email,
     startYear,

@@ -48,9 +48,10 @@
    * A high-contrast didone looks better at the top of that range and visibly
    * thins out at the bottom, which is why it was replaced.
    */
-  --els-font-display: 'Fraunces', georgia, 'Times New Roman', serif;
-  --els-font-mono: 'IBM Plex Mono', ui-monospace, sfmono-regular, menlo, monospace;
-  --els-font-sans: 'Archivo', system-ui, -apple-system, sans-serif;
+  --els-font-display: "Fraunces", georgia, "Times New Roman", serif;
+  --els-font-mono:
+    "IBM Plex Mono", ui-monospace, sfmono-regular, menlo, monospace;
+  --els-font-sans: "Archivo", system-ui, -apple-system, sans-serif;
 
   --els-radius: 2px;
   --els-gutter: clamp(1.25rem, 5vw, 5rem);
@@ -84,7 +85,7 @@
 }
 
 /* The palette is dark-only by design, but Infima still emits both scopes. */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ifm-background-color: var(--els-ink-900);
   --ifm-background-surface-color: var(--els-ink-800);
 }
@@ -133,8 +134,12 @@ body::before {
     ),
     linear-gradient(var(--els-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--els-line) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 72px, 72px 100%;
-  content: '';
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 72px,
+    72px 100%;
+  content: "";
   pointer-events: none;
   mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
 }
@@ -145,7 +150,7 @@ body::after {
   inset: 0;
   opacity: 0.5;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  content: '';
+  content: "";
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -218,7 +223,7 @@ a {
   position: absolute;
   width: 9px;
   height: 9px;
-  content: '';
+  content: "";
   transition: border-color var(--els-fast) var(--els-ease);
   pointer-events: none;
 }
@@ -262,7 +267,7 @@ a {
     transform var(--els-slow) var(--els-ease);
 }
 
-[data-reveal][data-revealed='true'] {
+[data-reveal][data-revealed="true"] {
   opacity: 1;
   transform: none;
 }

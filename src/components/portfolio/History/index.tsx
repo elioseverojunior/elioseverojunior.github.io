@@ -1,13 +1,13 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import {Counter} from '@site/src/components/portfolio/Counter';
-import {Section} from '@site/src/components/portfolio/Section';
-import type {SiteProfile, SiteRole, SiteTenure} from '@site/src/types/site';
-import styles from './styles.module.css';
+import { Counter } from "@site/src/components/portfolio/Counter";
+import { Section } from "@site/src/components/portfolio/Section";
+import type { SiteProfile, SiteRole, SiteTenure } from "@site/src/types/site";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+import styles from "./styles.module.css";
 
 /** The body of one title: prose from the curated source, figures and stack
  *  from the structured record. A tenure has one or the other, never both. */
-function TenureBody({tenure}: {readonly tenure: SiteTenure}): ReactNode {
+function TenureBody({ tenure }: { readonly tenure: SiteTenure }): ReactNode {
   return (
     <>
       {tenure.bullets.length > 0 && (
@@ -49,7 +49,7 @@ function TenureBody({tenure}: {readonly tenure: SiteTenure}): ReactNode {
   );
 }
 
-function Entry({role}: {readonly role: SiteRole}): ReactNode {
+function Entry({ role }: { readonly role: SiteRole }): ReactNode {
   const promoted = role.tenures.length > 1;
   const sole = role.tenures[0];
 
@@ -60,7 +60,7 @@ function Entry({role}: {readonly role: SiteRole}): ReactNode {
         aria-hidden="true"
       />
       <div className={styles.body}>
-        <p className={clsx('els-label', styles.period)}>
+        <p className={clsx("els-label", styles.period)}>
           {role.period}
           <span className={styles.sep}>/</span>
           {role.duration}
@@ -88,7 +88,7 @@ function Entry({role}: {readonly role: SiteRole}): ReactNode {
               <li className={styles.tenure} key={tenure.id}>
                 <div className={styles.tenureHead}>
                   <h4 className={styles.tenureTitle}>{tenure.title}</h4>
-                  <p className={clsx('els-label', styles.tenureMeta)}>
+                  <p className={clsx("els-label", styles.tenureMeta)}>
                     {tenure.period}
                     <span className={styles.sep}>/</span>
                     {tenure.duration}
@@ -125,7 +125,10 @@ export interface HistoryProps {
  * honours it. Everything else is condensed to one line — a recruiter needs the
  * recent work in depth and the early work only as proof of continuity.
  */
-export function History({profile, expandAll = false}: HistoryProps): ReactNode {
+export function History({
+  profile,
+  expandAll = false,
+}: HistoryProps): ReactNode {
   const recent = expandAll
     ? profile.roles
     : profile.roles.filter((role) => role.featured);
@@ -153,7 +156,7 @@ export function History({profile, expandAll = false}: HistoryProps): ReactNode {
 
       {earlier.length > 0 && (
         <div className={styles.earlier} data-reveal>
-          <p className={clsx('els-label', styles.earlierLabel)}>
+          <p className={clsx("els-label", styles.earlierLabel)}>
             Earlier · {earlier.length} roles
           </p>
           <ol className={styles.earlierList}>

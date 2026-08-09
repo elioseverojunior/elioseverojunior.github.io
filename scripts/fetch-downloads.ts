@@ -17,18 +17,20 @@
  * never silently rewrite the strongest evidence on the site. If *every* lookup
  * fails the script exits non-zero, so a broken CI refresh is loud.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import {parse as parseYaml} from 'yaml';
-import type {DownloadCache, GithubProfile} from '../src/types/github-profile';
+import fs from "node:fs";
+import path from "node:path";
 
-const DATA_DIR = path.join(import.meta.dirname, '..', 'data');
-const CACHE_FILE = path.join(DATA_DIR, '.download-cache.json');
+import { parse as parseYaml } from "yaml";
+
+import type { DownloadCache, GithubProfile } from "../src/types/github-profile";
+
+const DATA_DIR = path.join(import.meta.dirname, "..", "data");
+const CACHE_FILE = path.join(DATA_DIR, ".download-cache.json");
 
 // crates.io requires a User-Agent identifying the caller, and returns 403
 // without one.
 const USER_AGENT =
-  'elioseverojunior.github.io download-stats (github.com/elioseverojunior)';
+  "elioseverojunior.github.io download-stats (github.com/elioseverojunior)";
 
 const MAX_ATTEMPTS = 3;
 
@@ -40,27 +42,27 @@ interface Target {
 }
 
 function readNumber(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 /** `{crate: {downloads: 26343}}` */
 function readCrate(payload: unknown): number | null {
-  if (typeof payload !== 'object' || payload === null) {
+  if (typeof payload !== "object" || payload === null) {
     return null;
   }
-  const crate = (payload as {crate?: unknown}).crate;
-  if (typeof crate !== 'object' || crate === null) {
+  const crate = (payload as { crate?: unknown }).crate;
+  if (typeof crate !== "object" || crate === null) {
     return null;
   }
-  return readNumber((crate as {downloads?: unknown}).downloads);
+  return readNumber((crate as { downloads?: unknown }).downloads);
 }
 
 /** `{downloads: 3896}` */
 function readProvider(payload: unknown): number | null {
-  if (typeof payload !== 'object' || payload === null) {
+  if (typeof payload !== "object" || payload === null) {
     return null;
   }
-  return readNumber((payload as {downloads?: unknown}).downloads);
+  return readNumber((payload as { downloads?: unknown }).downloads);
 }
 
 function sleep(ms: number): Promise<void> {
@@ -72,7 +74,7 @@ async function fetchOne(target: Target): Promise<number | null> {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
     try {
       const response = await fetch(target.url, {
-        headers: {'user-agent': USER_AGENT, accept: 'application/json'},
+        headers: { "user-agent": USER_AGENT, accept: "application/json" },
       });
 
       // A 404 is a fact about the package, not a transient fault — retrying
@@ -110,9 +112,9 @@ function loadCache(): DownloadCache {
     return {};
   }
   try {
-    return JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8')) as DownloadCache;
+    return JSON.parse(fs.readFileSync(CACHE_FILE, "utf8")) as DownloadCache;
   } catch {
-    console.warn('Existing cache is unreadable; starting from empty.');
+    console.warn("Existing cache is unreadable; starting from empty.");
     return {};
   }
 }
@@ -148,7 +150,7 @@ function collectTargets(profile: GithubProfile): Target[] {
 
 async function main(): Promise<void> {
   const profile = parseYaml(
-    fs.readFileSync(path.join(DATA_DIR, 'github-profile.yaml'), 'utf8'),
+    fs.readFileSync(path.join(DATA_DIR, "github-profile.yaml"), "utf8"),
   ) as GithubProfile;
 
   const targets = collectTargets(profile);
@@ -165,13 +167,13 @@ async function main(): Promise<void> {
 
   const fetched = results.filter((result) => result.value !== null);
   if (fetched.length === 0) {
-    console.error('Every lookup failed; leaving the cache untouched.');
+    console.error("Every lookup failed; leaving the cache untouched.");
     process.exitCode = 1;
     return;
   }
 
   const next: Record<string, number> = {};
-  results.forEach(({target, value}) => {
+  results.forEach(({ target, value }) => {
     const carried = previous[target.key];
     const resolved = value ?? carried;
     if (resolved !== undefined) {
@@ -184,14 +186,14 @@ async function main(): Promise<void> {
     Object.entries(next).sort(([a], [b]) => a.localeCompare(b)),
   );
 
-  fs.writeFileSync(CACHE_FILE, `${JSON.stringify(sorted, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(CACHE_FILE, `${JSON.stringify(sorted, null, 2)}\n`, "utf8");
 
   const total = Object.values(sorted).reduce((sum, value) => sum + value, 0);
   console.log(
     `\nWrote ${Object.keys(sorted).length} entries (${fetched.length} refreshed, ` +
       `${results.length - fetched.length} carried over).`,
   );
-  console.log(`Combined downloads: ${total.toLocaleString('en-US')}`);
+  console.log(`Combined downloads: ${total.toLocaleString("en-US")}`);
 }
 
 await main();
