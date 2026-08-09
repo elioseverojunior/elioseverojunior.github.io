@@ -588,6 +588,25 @@ usage = '''
 flag "-v --verbose" help="Trace each command as it runs"
 '''
 
+[tasks."data:update:force"]
+alias = ["data:pull:force", "submodule:update:force"]
+description = "Fast-forward data/ to the remote force"
+run = '''
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+if [ "${usage_verbose:-false}" = "true" ]; then
+  set -x
+fi
+
+git submodule update --init --force --checkout --recursive --remote
+'''
+shell = "bash -c"
+usage = '''
+flag "-v --verbose" help="Trace each command as it runs"
+'''
+
 [tasks."data:reset"]
 alias = ["data:restore", "submodule:reset"]
 description = "Discard uncommitted edits in data/ and return to the pinned commit"
