@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from 'react';
-import useIsBrowser from '@docusaurus/useIsBrowser';
+import useIsBrowser from "@docusaurus/useIsBrowser";
+import { useEffect, useRef, useState } from "react";
 
 /** Decelerating curve — fast start, long settle, so the final digits land softly. */
 function easeOutExpo(t: number): number {
@@ -32,10 +32,10 @@ export function useCountUp(target: number, durationMs = 1500): CountUp {
     }
 
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+    if (prefersReducedMotion || typeof IntersectionObserver === "undefined") {
       setValue(target);
       return;
     }
@@ -62,16 +62,16 @@ export function useCountUp(target: number, durationMs = 1500): CountUp {
         observer.disconnect();
         frame = window.requestAnimationFrame(step);
       },
-      {threshold: 0.4},
+      { threshold: 0.4 },
     );
 
     observer.observe(element);
 
-    return () => {
+    return (): void => {
       observer.disconnect();
       window.cancelAnimationFrame(frame);
     };
   }, [isBrowser, target, durationMs]);
 
-  return {ref, value};
+  return { ref, value };
 }

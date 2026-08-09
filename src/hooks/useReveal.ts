@@ -1,5 +1,5 @@
-import {useEffect} from 'react';
-import useIsBrowser from '@docusaurus/useIsBrowser';
+import useIsBrowser from "@docusaurus/useIsBrowser";
+import { useEffect } from "react";
 
 /**
  * Reveals every `[data-reveal]` element on the page as it scrolls into view by
@@ -20,18 +20,18 @@ export function useReveal(): void {
     }
 
     const targets = Array.from(
-      document.querySelectorAll<HTMLElement>('[data-reveal]'),
+      document.querySelectorAll<HTMLElement>("[data-reveal]"),
     );
 
     // Without IntersectionObserver, or when the reader has asked for reduced
     // motion, everything is simply shown. Content is never gated on animation.
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+    if (prefersReducedMotion || typeof IntersectionObserver === "undefined") {
       targets.forEach((element) => {
-        element.dataset.revealed = 'true';
+        element.dataset.revealed = "true";
       });
       return;
     }
@@ -43,16 +43,16 @@ export function useReveal(): void {
             return;
           }
           const element = entry.target as HTMLElement;
-          element.dataset.revealed = 'true';
+          element.dataset.revealed = "true";
           observer.unobserve(element);
         });
       },
       // Fires a little before the element's top edge arrives, so the motion
       // resolves as it enters rather than after it has already been read.
-      {rootMargin: '0px 0px -12% 0px', threshold: 0.05},
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
     );
 
     targets.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }, [isBrowser]);
 }
