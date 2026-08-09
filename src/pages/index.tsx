@@ -1,44 +1,30 @@
 import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Heading from '@theme/Heading';
-
-import styles from './index.module.css';
-
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
+import {useLanding} from '@site/src/data/site';
+import {useReveal} from '@site/src/hooks/useReveal';
+import {Contact} from '@site/src/components/portfolio/Contact';
+import {Credentials} from '@site/src/components/portfolio/Credentials';
+import {Hero} from '@site/src/components/portfolio/Hero';
+import {History} from '@site/src/components/portfolio/History';
+import {Impact} from '@site/src/components/portfolio/Impact';
+import {Shipped} from '@site/src/components/portfolio/Shipped';
+import {Stack} from '@site/src/components/portfolio/Stack';
 
 export default function Home(): ReactNode {
-  const {siteConfig} = useDocusaurusContext();
+  const profile = useLanding();
+  useReveal();
+
   return (
-    <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
-      <HomepageHeader />
+    <Layout description={profile.summary} title={profile.headline}>
+      <Hero profile={profile} />
       <main>
-        <HomepageFeatures />
+        <Impact profile={profile} />
+        <History profile={profile} />
+        <Stack profile={profile} />
+        <Shipped profile={profile} />
+        <Credentials profile={profile} />
       </main>
+      <Contact profile={profile} />
     </Layout>
   );
 }
