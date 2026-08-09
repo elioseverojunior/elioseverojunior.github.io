@@ -47,10 +47,7 @@ person:
 #   2  familiar; used incidentally, or superseded years ago
 #   1  aware only
 skills:
-  - {id: python,     name: Python,         kind: language,      level: 4, prominence: 2}
-  - {id: groovy,     name: Groovy,         kind: language,      level: 4}
-  - {id: typescript, name: TypeScript,     kind: language,      level: 4, prominence: 2}
-  - {id: postgres,   name: PostgreSQL,     kind: database,      level: 4, prominence: 3}
+  - {id: postgres,   name: PostgreSQL,     kind: database,      level: 5, prominence: 3}
   - {id: terraform,  name: Terraform,      kind: iac,           level: 5, prominence: 1}
   - {id: jenkins,    name: Jenkins,        kind: cicd,          level: 5, prominence: 2}
   - {id: gh-actions, name: GitHub Actions, kind: cicd,          level: 5, prominence: 1}
@@ -59,13 +56,16 @@ skills:
   - {id: istio,      name: Istio,          kind: container,     level: 5, prominence: 1}
   - {id: karpenter,  name: Karpenter,      kind: container,     level: 5, prominence: 1}
   # Programming Languages
-  - {id: go,         name: Go,         kind: language, level: 4, prominence: 2}
-  - {id: rust,       name: Rust,       kind: language, level: 4, prominence: 1}
-  - {id: csharp,     name: "C#",       kind: language, level: 5}
-  - {id: ruby,       name: Ruby,       kind: language, level: 2}
+  - {id: csharp,     name: "C#",       kind: language, level: 5, prominence: 2}
+  - {id: python,     name: Python,     kind: language, level: 5, prominence: 2}
+  - {id: typescript, name: TypeScript, kind: language, level: 5, prominence: 2}
+  - {id: go,         name: Go,         kind: language, level: 5, prominence: 2}
+  - {id: rust,       name: Rust,       kind: language, level: 5, prominence: 1}
+  - {id: groovy,     name: Groovy,     kind: language, level: 5, prominence: 2}
+  - {id: ruby,       name: Ruby,       kind: language, level: 3}
   - {id: bash,       name: Bash,       kind: language, level: 5, prominence: 2}
   - {id: powershell, name: PowerShell, kind: language, level: 4}
-  - {id: sql,        name: SQL,        kind: language, level: 4, prominence: 2}
+  - {id: sql,        name: SQL,        kind: language, level: 5, prominence: 2}
   # Programming Frameworks
   - {id: dotnet-framework, name: .NET Framework, kind: framework, level: 5}
   - {id: aspnet,           name: ASP.NET,        kind: framework, level: 5}
@@ -86,9 +86,9 @@ skills:
   # Visualization Tools
   - {id: grafana,       name: Grafana,           kind: observability, level: 5, prominence: 2}
   - {id: grafana-cloud, name: Grafana Cloud,     kind: observability, level: 5, prominence: 1}
-  - {id: datadog,       name: Datadog,           kind: observability, level: 4, prominence: 2}
-  - {id: new-relic,     name: New Relic,         kind: observability, level: 4}
-  - {id: cloudwatch,    name: Amazon CloudWatch, kind: observability, level: 4}
+  - {id: datadog,       name: Datadog,           kind: observability, level: 5, prominence: 2}
+  - {id: new-relic,     name: New Relic,         kind: observability, level: 5}
+  - {id: cloudwatch,    name: Amazon CloudWatch, kind: observability, level: 5, prominence: 2}
   # Cloud
   - {id: aws,   name: AWS,   kind: cloud, level: 5, prominence: 1}
   - {id: azure, name: Azure, kind: cloud, level: 3, prominence: 3}
@@ -102,28 +102,28 @@ skills:
   - {id: kops,             name: KOPS,             kind: container,     level: 4, prominence: 3}
   - {id: opentofu,         name: OpenTofu,         kind: iac,           level: 5, prominence: 1}
   - {id: terragrunt,       name: Terragrunt,       kind: iac,           level: 5, prominence: 3}
-  - {id: pulumi,           name: Pulumi,           kind: iac,           level: 4}
+  - {id: pulumi,           name: Pulumi,           kind: iac,           level: 5}
   - {id: argocd,           name: ArgoCD,           kind: cicd,          level: 5, prominence: 1}
   - {id: argo-rollouts,    name: Argo Rollouts,    kind: cicd,          level: 5, prominence: 1}
   - {id: flagger,          name: Flagger,          kind: cicd,          level: 5}
   - {id: docker,           name: Docker,           kind: container,     level: 5, prominence: 2}
   - {id: gitlab-cicd,      name: GitLab CI/CD,     kind: cicd,          level: 4, prominence: 2}
   - {id: prometheus,       name: Prometheus,       kind: observability, level: 5, prominence: 1}
-  - {id: opentelemetry,    name: OpenTelemetry,    kind: observability, level: 3, prominence: 2}
-  - {id: loki,             name: Loki,             kind: observability, level: 4, prominence: 2}
-  - {id: hashicorp-vault,  name: HashiCorp Vault,  kind: iac,           level: 4, prominence: 3}
-  - {id: hashicorp-consul, name: HashiCorp Consul, kind: iac,           level: 4}
-  - {id: hcp-terraform,    name: HCP Terraform,    kind: iac,           level: 4}
-  - {id: sentinel,         name: Sentinel,         kind: iac,           level: 3}
-  - {id: semgrep,          name: Semgrep,          kind: cicd,          level: 3}
-  - {id: concourse,        name: Concourse,        kind: cicd,          level: 3}
+  - {id: opentelemetry,    name: OpenTelemetry,    kind: observability, level: 5, prominence: 2}
+  - {id: alloy,            name: Alloy,            kind: observability, level: 5, prominence: 2}
+  - {id: loki,             name: Loki,             kind: observability, level: 5, prominence: 2}
+  - {id: hashicorp-vault,  name: HashiCorp Vault,  kind: iac,           level: 5, prominence: 3}
+  - {id: hashicorp-consul, name: HashiCorp Consul, kind: iac,           level: 5}
+  - {id: terraform,        name: Terraform,        kind: iac,           level: 5}
+  - {id: sentinel,         name: Sentinel,         kind: iac,           level: 5}
+  - {id: concourse,        name: Concourse,        kind: cicd,          level: 4}
   - {id: sops,             name: SOPS,             kind: iac,           level: 5, prominence: 3}
   - {id: sonarqube,        name: SonarQube,        kind: cicd,          level: 5, prominence: 3}
   - {id: snyk,             name: Snyk,             kind: cicd,          level: 5, prominence: 3}
-  - {id: zabbix,           name: Zabbix,           kind: observability, level: 2}
+  - {id: zabbix,           name: Zabbix,           kind: observability, level: 4, prominence: 2}
   - {id: backstage,        name: Backstage,        kind: cicd,          level: 4, prominence: 3}
-  - {id: sentry,           name: Sentry,           kind: observability, level: 4}
-  - {id: chef,             name: Chef,             kind: iac,           level: 3}
+  - {id: sentry,           name: Sentry,           kind: observability, level: 4, prominence: 2}
+  - {id: chef,             name: Chef,             kind: iac,           level: 4}
   - {id: tfs,              name: TFS,              kind: cicd,          level: 4}
   - {id: linux,            name: Linux,            kind: container,     level: 5, prominence: 2}
   - {id: jira,             name: Jira,             kind: methodology,   level: 5}
