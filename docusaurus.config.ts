@@ -6,8 +6,7 @@ import type { Config } from "@docusaurus/types";
 import { parse as parseYaml } from "yaml";
 
 import { adaptLanding, adaptRecord } from "./src/data/adapt";
-import type { DownloadCache, GithubProfile } from "./src/types/github-profile";
-import type { Profile } from "./src/types/profile";
+import type { DownloadCache, Profile } from "./src/types/profile";
 import type { SiteData } from "./src/types/site";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -15,13 +14,18 @@ import type { SiteData } from "./src/types/site";
 /**
  * Content pipeline.
  *
- * Three files under data/ feed this site, and each is used for the job it was
- * authored for:
+ * Two files under data/ feed this site, both supplied by the `profile-data`
+ * submodule mounted there:
  *
- *   github-profile.yaml   curated pitch — headline, per-role bullets, impact
- *   profile.yaml          complete record — dated history, skill depth ratings
+ *   profile.yml           the whole record — positioning copy, dated history,
+ *                         per-role bullets, skill depth ratings, impact
  *   .download-cache.json  registry download totals, refreshed by
  *                         `bun run fetch:downloads`
+ *
+ * There was a second YAML file, github-profile.yaml, holding a curated pitch.
+ * It is gone: one career described by two files is two files to keep in
+ * agreement, and they had already drifted — the site was publishing an 83%
+ * figure the record put at 75%.
  *
  * They are parsed and adapted into a view model here, in Node, rather than
  * through a bundler loader rule: @docusaurus/faster swaps webpack for Rspack,
@@ -30,7 +34,7 @@ import type { SiteData } from "./src/types/site";
  * This is also the privacy boundary. `customFields` is serialised verbatim into
  * the client JavaScript bundle, so anything reachable from it ships to every
  * visitor whether or not a component renders it — the phone number in
- * profile.yaml is dropped by the adapters and never reaches the browser.
+ * profile.yml is dropped by the adapters and never reaches the browser.
  */
 const dataDir = path.join(__dirname, "data");
 
@@ -52,14 +56,13 @@ function readDownloads(): DownloadCache {
 }
 
 const now = new Date();
+// Read once and shared by both adapters: parsing the same 20 KB of YAML twice
+// per build bought nothing, and two parses could not disagree usefully anyway.
+const record = readYaml<Profile>("profile.yml");
+const downloads = readDownloads();
 const site: SiteData = {
-  landing: adaptLanding(
-    readYaml<GithubProfile>("github-profile.yaml"),
-    readYaml<Profile>("profile.yaml"),
-    readDownloads(),
-    now,
-  ),
-  cv: adaptRecord(readYaml<Profile>("profile.yaml"), readDownloads(), now),
+  landing: adaptLanding(record, downloads, now),
+  cv: adaptRecord(record, downloads, now),
 };
 
 const { landing } = site;
@@ -93,7 +96,9 @@ const config: Config = {
   url: "https://elioseverojunior.github.io",
   baseUrl,
   organizationName: "elioseverojunior",
-  projectName: "docusaurus-profile",
+  // The GitHub Pages user site: this repository IS elioseverojunior.github.io,
+  // which is why baseUrl is "/" rather than a project subpath.
+  projectName: "elioseverojunior.github.io",
   // Read only by `docusaurus deploy`, which is not how this site ships:
   // .github/workflows/publish.yml uploads the built directory straight to
   // Pages, so no gh-pages branch is ever created.
