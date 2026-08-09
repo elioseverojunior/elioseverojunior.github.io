@@ -79,7 +79,7 @@ const primaryGithub = landing.links.find((link) => link.name === "GitHub");
  * 404 in production and a working link in local development, which is the worst
  * combination available.
  */
-const baseUrl = "/docusaurus-profile/";
+const baseUrl = "/";
 
 const config: Config = {
   title: landing.name,
