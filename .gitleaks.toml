@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: RUST-TOOLCHAIN contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+# Gitleaks configuration
+# See https://github.com/gitleaks/gitleaks#configuration
+
+[allowlist]
+    # Allow test token in .act/secrets for local act simulation
+    paths = [
+        "(.*?)\\.act/.secrets",
+        "(.*?)\\.env\\.example",
+        "(.*?)\\.env\\.sample",
+        "(.*?)\\.env\\.template",
+        # Dependency trees and build caches. gitleaks does NOT read
+        # `.gitignore`, and `gitleaks dir` takes a single path — so every
+        # invocation handed more than one file falls back to walking the whole
+        # working directory. That is 578 MB here against 3.3 MB of tracked
+        # content: `node_modules` is 383 MB and `docs/node_modules` another
+        # 307 MB, none of it committed and none of it ours. Scanning it cost
+        # 4m17s on every multi-file commit and every `hk check --all`, which is
+        # long enough that the check stops being run.
+        "(.*/)?node_modules/.*",
+        "(.*/)?\\.vitepress/cache/.*",
+        "(.*/)?\\.vitepress/dist/.*",
+        "(.*/)?target/.*",
+        "(.*/)?\\.git/.*",
+    ]
+    regexes = [
+        # The fixture cache key used across the tests and the design docs.
+        # `generateCacheKey` concatenates a rustc commit date with a commit
+        # hash, and `generateSpecCacheKey` appends a SHA-256 digest of the
+        # resolved spec; both are content digests of public data, never
+        # credentials. Their entropy is inherent to being digests, which is
+        # exactly what trips the generic-api-key rule. Scoped to the literal
+        # fixture rather than to a path, so a real secret in the same file is
+        # still caught.
+        "20250915abcd(-1f2e3d4c)?",
+        # Azurite's well-known development storage account key, published by
+        # Microsoft and identical in every installation. It reaches this
+        # repository as vendored code, not as configuration:
+        # `@actions/cache` -> `@azure/storage-blob` -> `@azure/storage-common`,
+        # whose `DevelopmentConnectionString` constant is inlined verbatim into
+        # the committed `dist/index.js`.
+        #
+        # Allowlisted rather than tolerated, because the alternative is a
+        # coin-flip in CI. The line has been in the bundle since
+        # `@actions/cache` landed and gitleaks reported it on some rebuilds and
+        # not others: the content never changed, but the bundle's byte length
+        # did, moving the line across gitleaks' internal read boundary. A check
+        # that passes or fails on where a byte lands is worse than no check,
+        # because it teaches everyone to re-run it.
+        #
+        # Scoped to the literal key, so a genuine Azure credential appearing in
+        # the same file is still caught.
+        "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==",
+    ]
+    commits = []
+    stopwords = []
