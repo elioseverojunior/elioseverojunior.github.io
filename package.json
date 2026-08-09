@@ -13,6 +13,7 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "typecheck": "tsc",
+    "fetch:downloads": "bun run scripts/fetch-downloads.ts",
     "deps": "bunx --bun npm-check-updates -u --target minor && bun install",
     "deps:check": "bunx --bun npm-check-updates --target minor",
     "deps:latest": "bunx --bun npm-check-updates -u --target latest && bun install"
