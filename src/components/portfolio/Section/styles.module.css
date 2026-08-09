@@ -1,10 +1,15 @@
 .section {
   position: relative;
-  padding-block: clamp(4.5rem, 11vh, 8rem);
+  /* Padding-block, so the gap between two sections is the sum of both — the
+     rendered space is twice this figure. Tightened from 4.5–8rem: at the old
+     value two adjacent sections put up to 16rem of empty ground between them,
+     which on a laptop viewport meant scrolling past a screen of nothing
+     between numbered blocks that are meant to read as one continuous run. */
+  padding-block: clamp(2.75rem, 6vh, 4.5rem);
 }
 
 .header {
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem);
 }
 
 .marker {
