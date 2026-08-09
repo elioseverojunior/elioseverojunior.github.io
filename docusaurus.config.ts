@@ -200,11 +200,19 @@ const config: Config = {
     },
     navbar: {
       title: landing.acronym,
-      hideOnScroll: true,
+      // Pinned, not hide-on-scroll. This page is one long scroll through five
+      // numbered sections and the navbar is how a reader jumps between them —
+      // a bar that disappears the moment you scroll down is missing exactly
+      // when it is wanted. custom.css already assumed this: its
+      // `scroll-padding-top` reserves the navbar height so anchor targets are
+      // not hidden underneath, which only makes sense for a bar that stays.
+      hideOnScroll: false,
       items: [
         { to: "/#impact", label: "Impact", position: "left" },
-        { to: "/#history", label: "Experience", position: "left" },
+        // Navbar order tracks the page order, so a reader scanning the bar and
+        // a reader scrolling the page meet the sections in the same sequence.
         { to: "/#stack", label: "Stack", position: "left" },
+        { to: "/#history", label: "Experience", position: "left" },
         { to: "/#shipped", label: "Open Source", position: "left" },
         { to: "/cv", label: "Full CV", position: "right" },
         ...(primaryGithub
