@@ -1,22 +1,29 @@
 {
-  "name": ".",
-  "version": "0.0.0",
+  "name": "docusaurus-profile",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
     "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
-    "serve": "docusaurus serve",
-    "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc",
-    "fetch:downloads": "bun run scripts/fetch-downloads.ts",
+    "deploy": "docusaurus deploy",
     "deps": "bunx --bun npm-check-updates -u --target minor && bun install",
     "deps:check": "bunx --bun npm-check-updates --target minor",
-    "deps:latest": "bunx --bun npm-check-updates -u --target latest && bun install"
+    "deps:latest": "bunx --bun npm-check-updates -u --target latest && bun install",
+    "docusaurus": "docusaurus",
+    "eslint:lint": "eslint --max-warnings 0 .",
+    "eslint:lint:fix": "eslint --fix --max-warnings 0 .",
+    "fetch:downloads": "bun run scripts/fetch-downloads.ts",
+    "fix:all": "bun run eslint:lint:fix && bun run prettier:format:fix",
+    "lint": "bun run eslint:lint && bun run prettier:format",
+    "prettier:format": "prettier --check .",
+    "prettier:format:fix": "prettier --write .",
+    "serve": "docusaurus serve",
+    "start": "docusaurus start",
+    "swizzle": "docusaurus swizzle",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "write-translations": "docusaurus write-translations"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
@@ -46,8 +53,16 @@
     "mermaid": "11.16.1",
     "prettier": "3.9.6",
     "prettier-plugin-organize-imports": "4.3.0",
-    "typescript": "~7.0.2"
+    "typescript": "~6.0.3"
   },
+  "peerDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "trustedDependencies": [
+    "@swc/core",
+    "core-js",
+    "unrs-resolver"
+  ],
   "browserslist": {
     "production": [
       ">0.5%",
