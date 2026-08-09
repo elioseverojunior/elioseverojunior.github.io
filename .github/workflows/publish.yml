@@ -71,6 +71,26 @@ jobs:
           # authenticates with this token, which is why no deploy key is needed.
           token: ${{ steps.app-token.outputs.token }}
 
+      # Build from the tip of profile-data's main, not the commit pinned here.
+      #
+      # The record is content, not a code dependency. It is edited far more
+      # often than this site, and a pinned gitlink means every edit needs a bump
+      # commit here before it can reach the page — which is precisely how the
+      # last build broke: the record gained four skills, the bump was dropped
+      # by an IDE rebase, and CI faithfully rendered the older record.
+      #
+      # The cost is reproducibility. Rebuilding an old commit of this repo now
+      # renders today's record rather than the one it was written against, and
+      # a bad edit in profile-data can break this site with no change here. That
+      # trade is taken deliberately: a CV wants to be current far more than it
+      # wants to be re-creatable, and the gitlink still pins local development
+      # so `bun run build` on a fresh clone is not chasing a moving target.
+      #
+      # `--remote` follows the `branch = main` already declared in .gitmodules;
+      # without it this would re-checkout the same pinned commit and do nothing.
+      - name: Advance the record to the tip of profile-data
+        run: git submodule update --remote --recursive data
+
       # Installs the mise-managed tools, restores the Bun cache, installs with
       # --frozen-lockfile and audits blocked post-install scripts. It also
       # applies the github-actions[bot] git identity via bot-setup — unused in
