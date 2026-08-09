@@ -1,7 +1,11 @@
 // Relative, not `@site/*`: this module is imported by docusaurus.config.ts and
 // evaluated in plain Node, where the `@site` alias does not exist.
-import type { DownloadCache, GithubProfile } from "../types/github-profile";
-import type { Profile, Skill, SkillKind } from "../types/profile";
+import type {
+  DownloadCache,
+  Profile,
+  Skill,
+  SkillKind,
+} from "../types/profile";
 import type {
   SiteCertification,
   SiteLink,
@@ -39,15 +43,9 @@ function normalizeSkillName(name: string): string {
 }
 
 function toSiteSkill(skill: Skill): SiteSkill {
-  return { name: skill.name, level: skill.level, core: skill.prominence === 1 };
-}
-
-function crateUrl(name: string): string {
-  return `https://crates.io/crates/${name}`;
-}
-
-function providerUrl(namespace: string, name: string): string {
-  return `https://registry.terraform.io/providers/${namespace}/${name}/latest/docs`;
+  // Highlighted on `level`, not `prominence` — see the skill-group mapping in
+  // adaptLanding for why depth is the signal a reader is actually scanning for.
+  return { name: skill.name, level: skill.level, core: skill.level === 5 };
 }
 
 function sumDownloads(projects: readonly SiteProject[]): number {
@@ -64,18 +62,6 @@ function earliestYear(starts: readonly string[], fallback: number): number {
   return years.length === 0 ? fallback : Math.min(...years);
 }
 
-/** `https://github.com/elioseverojunior` -> `/elioseverojunior`. */
-function handleOf(url: string): string {
-  try {
-    const parsed = new URL(url);
-    return parsed.pathname === "/"
-      ? parsed.hostname
-      : parsed.pathname.replace(/\/$/, "");
-  } catch {
-    return url;
-  }
-}
-
 /**
  * Substitutes `{{years}}` in prose with the years computed from the record.
  *
@@ -88,14 +74,6 @@ function handleOf(url: string): string {
 function applyTokens(text: string, years: number): string {
   return text.replace(/\{\{\s*years\s*\}\}/g, String(years));
 }
-
-const LINK_LABELS: Readonly<Record<string, string>> = {
-  github: "GitHub",
-  github_org: "GitHub",
-  linkedin: "LinkedIn",
-  stackoverflow: "Stack Overflow",
-  readthedocs: "Read the Docs",
-};
 
 /* ==========================================================================
    Employer grouping
@@ -184,13 +162,13 @@ function groupByEmployer(raw: readonly RawTenure[], now: Date): SiteRole[] {
    ========================================================================== */
 
 /**
- * Builds the landing view from `github-profile.yaml`.
+ * Builds the landing view from the profile record.
  *
- * The curated file carries no contact details or acronym, so those are taken
- * from the structured record — the one place they are written down.
+ * Everything comes from `data/profile.yml`. A second curated file used to
+ * supply the positioning copy and the per-role bullets; it is gone, and the
+ * fields it held now live on `person` and `Role` respectively.
  */
 export function adaptLanding(
-  gh: GithubProfile,
   record: Profile,
   downloads: DownloadCache,
   now: Date,
@@ -199,34 +177,67 @@ export function adaptLanding(
     record.skills.map((skill) => [normalizeSkillName(skill.name), skill]),
   );
 
-  // The curated file has no industry field; the record does, keyed by employer.
-  const industryByEmployer = new Map(
-    record.experience
-      .filter((role) => role.industry !== undefined)
-      .map((role) => [role.employer.toLowerCase(), role.industry]),
-  );
-
+  // Only roles carrying authored prose reach the landing page. The record runs
+  // back to 2003 and the early entries exist for the CV, where the full history
+  // is the point; leading with all fourteen would bury the recent four.
   const roles = groupByEmployer(
-    gh.experience.map((entry, index): RawTenure => ({
-      id: `${entry.company}-${entry.start}-${index}`,
-      company: entry.company,
-      industry: industryByEmployer.get(entry.company.toLowerCase()),
-      title: entry.title,
-      start: entry.start,
-      end: entry.end,
-      featured: entry.featured,
-      bullets: entry.bullets.map(prose),
-      tech: [],
-      metrics: [],
-    })),
+    record.experience
+      .filter((entry) => (entry.bullets ?? []).length > 0)
+      .map((entry, index): RawTenure => ({
+        id: `${entry.employer}-${entry.start}-${index}`,
+        company: entry.employer,
+        industry: entry.industry,
+        // `titles` is a list because one continuous tenure can carry several;
+        // the landing page shows the one held longest, which is the first.
+        title: entry.titles[0] ?? "",
+        start: entry.start,
+        end: entry.end ?? "present",
+        featured: entry.featured ?? false,
+        bullets: (entry.bullets ?? []).map(prose),
+        tech: [],
+        metrics: [],
+      })),
     now,
   );
 
-  const metrics: SiteMetric[] = gh.impact.map((entry, index) => {
-    const parsed = parseMetric(entry.metric);
+  // Every measured figure, by id, so `impact` can name one instead of
+  // restating it.
+  const metricsById = new Map(
+    record.experience.flatMap((role) =>
+      role.metrics.map((metric) => [metric.id, metric] as const),
+    ),
+  );
+
+  const metrics: SiteMetric[] = record.impact.map((entry, index) => {
+    const referenced = entry.metrics.map((id) => {
+      const metric = metricsById.get(id);
+      if (metric === undefined) {
+        // Loud on purpose. A silent skip would drop a headline figure from the
+        // page and leave the remaining tiles looking deliberate.
+        throw new Error(
+          `impact[${index}] references unknown metric id "${id}". ` +
+            `Valid ids: ${[...metricsById.keys()].join(", ")}`,
+        );
+      }
+      return metric;
+    });
+
+    // Summing is what turns 216 non-production and 27 production migrations
+    // into the single 243 they were. Percentages are never summed, so a
+    // multi-id percentage entry is a data error rather than a rounding one.
+    const unit = referenced[0]?.unit ?? "";
+    if (referenced.length > 1 && unit === "percent") {
+      throw new Error(
+        `impact[${index}] sums ${referenced.length} percentages, which is not a meaningful figure.`,
+      );
+    }
+    const total = referenced.reduce((sum, metric) => sum + metric.value, 0);
+    const display = unit === "percent" ? `${total}%` : String(total);
+    const parsed = parseMetric(display);
+
     return {
       id: `impact-${index}`,
-      display: entry.metric,
+      display,
       value: parsed.value,
       prefix: parsed.prefix,
       suffix: parsed.suffix,
@@ -235,38 +246,57 @@ export function adaptLanding(
     };
   });
 
-  const skillGroups: SiteSkillGroup[] = gh.skill_order
+  const skillGroups: SiteSkillGroup[] = record.skill_order
     .map((label) => ({
       id: label.toLowerCase().replace(/\s+/g, "-"),
       label,
-      skills: (gh.skills[label] ?? []).map((name) => {
+      skills: (record.skill_groups[label] ?? []).map((name) => {
         const known = depthByName.get(normalizeSkillName(name));
-        return { name, level: known?.level, core: known?.prominence === 1 };
+        // Highlighted on depth, not on `prominence`. `level` 5 is "daily
+        // working tool; designs, owns and debugs it unaided in production" —
+        // an assessment of the work itself, which is what a reader scanning
+        // the stack is trying to judge. `prominence` answers a different
+        // question (which direction the career is heading) and is left to the
+        // consumers that ask it.
+        return { name, level: known?.level, core: known?.level === 5 };
       }),
     }))
     .filter((group) => group.skills.length > 0);
 
-  const crates: SiteProject[] = gh.projects.crates.map((crate) => ({
-    id: `crate-${crate.name}`,
-    name: crate.name,
-    kind: "Rust crate",
-    summary: crate.summary,
-    url: crateUrl(crate.name),
-    repo: crate.repo,
-    downloads: downloads[`crate:${crate.name}`],
-  }));
+  const crates: SiteProject[] = record.projects
+    .filter((project) => project.kind === "crate")
+    .map((crate) => ({
+      id: `crate-${crate.id}`,
+      name: crate.name,
+      kind: "Rust crate",
+      summary: crate.summary,
+      url: crate.url,
+      downloads: downloads[`crate:${crate.name}`],
+    }));
 
-  const providers: SiteProject[] = gh.projects.terraform_providers.map(
-    (provider) => ({
-      id: `provider-${provider.namespace}-${provider.name}`,
-      name: provider.name,
-      kind: "Terraform provider",
-      summary: provider.summary,
-      url: providerUrl(provider.namespace, provider.name),
-      repo: provider.repo,
-      downloads: downloads[`provider:${provider.namespace}/${provider.name}`],
-    }),
-  );
+  const providers: SiteProject[] = record.projects
+    .filter((project) => project.kind === "terraform-provider")
+    .map((provider) => {
+      // The record stores the registry URL, not the namespace and name as
+      // separate fields, so the download-cache key is read back out of it:
+      //   https://registry.terraform.io/providers/<ns>/<name>/latest/docs
+      // A URL that does not match yields no key, and the entry simply renders
+      // without a figure rather than reporting someone else's downloads.
+      const parts = /\/providers\/([^/]+)\/([^/]+)/.exec(provider.url);
+      const namespace = parts?.[1];
+      const registryName = parts?.[2];
+      return {
+        id: `provider-${provider.id}`,
+        name: provider.name,
+        kind: "Terraform provider",
+        summary: provider.summary,
+        url: provider.url,
+        downloads:
+          namespace === undefined || registryName === undefined
+            ? undefined
+            : downloads[`provider:${namespace}/${registryName}`],
+      };
+    });
 
   // Highest usage first: the table doubles as evidence, so the strongest
   // figures should not be buried behind alphabetical accident.
@@ -274,15 +304,12 @@ export function adaptLanding(
     (a, b) => (b.downloads ?? 0) - (a.downloads ?? 0),
   );
 
-  const links: SiteLink[] = Object.entries(gh.links)
-    // `site` is this page; linking a visitor back to where they already are is
-    // noise, so it is dropped rather than rendered.
-    .filter(([key]) => key !== "site")
-    .map(([key, url]) => ({
-      name: LINK_LABELS[key] ?? key,
-      handle: handleOf(url),
-      url,
-    }));
+  // The record already stores links as name/handle/url, so nothing is derived
+  // here. Entries pointing at this site are dropped: sending a visitor back to
+  // the page they are on is noise.
+  const links: SiteLink[] = record.person.links.filter(
+    (link) => !link.url.includes("elioseverojunior.github.io"),
+  );
 
   const startYear = earliestYear(
     record.experience.map((role) => role.start),
@@ -290,11 +317,11 @@ export function adaptLanding(
   );
 
   return {
-    name: gh.identity.name,
+    name: record.person.name,
     acronym: record.person.acronym,
-    headline: gh.identity.headline,
-    tagline: applyTokens(gh.identity.tagline, now.getFullYear() - startYear),
-    summary: applyTokens(gh.identity.summary, now.getFullYear() - startYear),
+    headline: record.person.headline,
+    tagline: applyTokens(record.person.tagline, now.getFullYear() - startYear),
+    summary: applyTokens(record.person.summary, now.getFullYear() - startYear),
     location: record.person.location,
     email: record.person.email,
     startYear,
@@ -312,21 +339,20 @@ export function adaptLanding(
       0,
     ),
     projects,
-    recentProjects: (gh.projects.recent ?? []).map((entry) => ({
-      id: `recent-${entry.name}`,
-      name: entry.name,
-      summary: entry.summary,
-      url: `https://github.com/${entry.repo}`,
-      shipped: entry.shipped,
-    })),
+    // The record has no "recently shipped" concept — every published project
+    // is in `projects` with its registry figures, which is the stronger
+    // evidence anyway. Kept as an empty list so the section renders nothing
+    // rather than the view model gaining an optional field for one consumer.
+    recentProjects: [],
     downloadsTotal: sumDownloads(projects),
-    education: gh.education.map((entry) => ({
+    education: record.education.map((entry) => ({
       degree: entry.degree,
       field: entry.field,
       institution: entry.institution,
       year: entry.year,
+      state: entry.state,
     })),
-    certifications: gh.certifications.map((entry): SiteCertification => ({
+    certifications: record.certifications.map((entry): SiteCertification => ({
       name: entry.name,
       // The source leaves one issuer blank; rendering an empty heading would
       // look like a bug, so it is labelled honestly instead.
@@ -478,7 +504,8 @@ export function adaptRecord(
       degree: entry.degree,
       field: entry.field,
       institution: entry.institution,
-      year: String(entry.year),
+      year: entry.year,
+      state: entry.state,
     })),
     certifications: record.certifications.map((entry) => ({
       name: entry.name,
