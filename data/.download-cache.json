@@ -1,0 +1,9 @@
+{
+  "crate:comply": 64,
+  "crate:rust-yaml": 26397,
+  "provider:elioetibr/dnsmasq": 452,
+  "provider:elioetibr/sops": 234,
+  "provider:elioseverojunior/docker": 683,
+  "provider:elioseverojunior/kind": 897,
+  "provider:elioseverojunior/strcase": 3896
+}

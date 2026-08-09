@@ -1,0 +1,227 @@
+identity:
+  name: Elio Severo Junior
+  headline: Senior SRE & Cloud Engineer
+  # {{years}} is substituted at build time from the earliest start date in
+  # profile.yaml, so this sentence cannot drift out of date.
+  tagline: "{{years}} years building and operating large-scale, self-healing AWS estates"
+  summary: >-
+    Senior SRE and cloud engineering leader with {{years}} years building and operating
+    large-scale, self-healing AWS estates, with production depth across Azure and GCP.
+    Industry coverage spans B2B SaaS, agribusiness, EdTech, quick-service restaurant
+    e-commerce and retail banking, delivered hands-on and as manager of distributed
+    cross-border squads. I also author and maintain published open-source
+    infrastructure tooling in Rust and Go.
+  location: Brazil
+  current_role:
+    title: Senior SRE Cloud Engineer
+    company: Viafoura
+    since: 2024-10
+
+links:
+  github: https://github.com/elioseverojunior
+  github_org: https://github.com/elioetibr
+  linkedin: https://www.linkedin.com/in/elio
+  stackoverflow: https://stackoverflow.com/users/4868262
+  readthedocs: https://elioseverojunior.readthedocs.io/en/latest
+  site: https://elioseverojunior.github.io
+
+impact:
+  - metric: "243"
+    label: core applications migrated from legacy KOPS to AWS EKS 1.33
+    detail: zero customer-facing downtime via Route53 weighted routing, Argo Rollouts and Istio traffic shifting
+  - metric: 35%
+    label: EC2 spend reduction
+    detail: Karpenter consolidation, ARM64 Graviton node pools and automated spot execution
+  - metric: ~60%
+    label: mean-time-to-detect reduction on production incidents
+    detail: observability codified as infrastructure across Grafana Cloud, Loki, Prometheus, Datadog and OpenTelemetry
+  - metric: 83%
+    label: deployment lead-time reduction
+    detail: quarterly release batches replaced by twice-monthly production delivery
+
+projects:
+  crates:
+    - name: rust-yaml
+      repo: elioetibr/rust-yaml
+      summary: Fast, safe YAML 1.2 library for Rust
+  terraform_providers:
+    - namespace: elioseverojunior
+      name: strcase
+      repo: elioseverojunior/terraform-provider-strcase
+      summary: String case conversion functions for Terraform
+    - namespace: elioseverojunior
+      name: kind
+      repo: elioseverojunior/terraform-provider-kind
+      summary: Ephemeral Kubernetes-in-Docker clusters for CI and local test harnesses
+    - namespace: elioseverojunior
+      name: docker
+      repo: elioseverojunior/terraform-provider-docker
+      summary: Declarative container lifecycle and image resources
+    - namespace: elioetibr
+      name: dnsmasq
+      repo: elioetibr/terraform-provider-dnsmasq
+      summary: Local DNS record management as infrastructure as code
+    - namespace: elioetibr
+      name: sops
+      repo: elioetibr/terraform-provider-sops
+      summary: Native decryption of SOPS-managed secrets inside Terraform plans
+  # Published too recently for a download figure to carry information. These are
+  # announced beneath the downloads table rather than listed in it: everything
+  # under `crates` above is both a table row and a term in the combined total
+  # the section headlines, so a just-published project would sit as a near-zero
+  # row directly under the strongest claim on the page. `crates` here still
+  # feeds the crates.io badge count, so the work is counted without being
+  # measured on a number that has had no time to mean anything.
+  recent:
+    - name: comply
+      summary: REUSE/SPDX compliance tooling for Rust
+      repo: elioseverojunior/comply
+      shipped: July 2026
+      crates:
+        - comply
+        - comply-cli
+
+skill_order:
+  - Languages
+  - Cloud
+  - Orchestration
+  - Infrastructure as Code
+  - Observability
+  - Data
+  - Security
+
+skills:
+  Languages: [Rust, Go, Python, "C#", Ruby, Bash, PowerShell, SQL]
+  Cloud: [AWS, Azure, GCP]
+  Orchestration: [Kubernetes, EKS, KOPS, Helm, Istio, ArgoCD, Argo Rollouts, Karpenter, Docker]
+  Infrastructure as Code: [Terraform, OpenTofu, Terragrunt, Pulumi]
+  Observability: [Grafana, Grafana Cloud, Prometheus, Loki, OpenTelemetry, Datadog, CloudWatch]
+  Data: [Apache Airflow, AWS Glue, Athena, Lake Formation, Step Functions, Redshift, PostgreSQL, Liquibase]
+  Security: [HashiCorp Vault, Consul, SOPS, SonarQube, Snyk]
+
+experience:
+  - title: Senior SRE Cloud Engineer
+    company: Viafoura
+    start: 2024-10
+    end: present
+    featured: true
+    bullets:
+      - Led the KOPS to AWS EKS 1.33 migration of the core application estate using Route53 weighted routing, Argo Rollouts and Istio traffic shifting, completing cutover without customer-facing downtime.
+      - Containerized legacy workloads and authored Helm charts guarded by values.schema.json, rejecting invalid GitOps values before they reach a cluster.
+      - Provisioned data-lake and analytics infrastructure with Terraform and OpenTofu across Athena, Glue Data Catalog, Redshift, Step Functions and Airflow, applying Lake Formation column- and table-level governance for least-privilege analyst access.
+      - Codified observability as infrastructure in Terraform across Grafana Cloud dashboards, Loki log pipelines, Prometheus alert rules, Datadog dashboards and label-based Slack routing with OpenTelemetry.
+      - Standardized multi-account governance with AWS Account Factory for Terraform, Well-Architected guardrails and IAM Identity Center, and migrated legacy Jenkins jobs to declarative GitHub Actions reusable workflows with ArgoCD-centralized GitOps enabling canary and blue-green releases.
+  - title: Senior SRE Cloud Engineer
+    company: Stanza Systems
+    start: 2023-10
+    end: 2024-10
+    featured: true
+    bullets:
+      - Provisioned secure Amazon SageMaker and Bedrock endpoints with Terraform using scoped IAM execution roles, VPC network isolation and per-workload budget guardrails.
+      - Maintained multi-environment GitLab CI/CD pipelines enforcing a strict validate, plan and gated apply workflow with Jira ticket-first traceability.
+      - Tuned Karpenter-based autoscaling and cluster ingress to absorb variable demand without over-provisioning.
+      - Gated production deployment with SAST scanning, SonarQube quality gates, SOPS-encrypted Helm secrets and ArgoCD sync policies.
+  - title: SRE Cloud Engineering Manager
+    company: Nutrien Soluções Agrícolas
+    start: 2022-04
+    end: 2023-09
+    featured: true
+    bullets:
+      - Led the LATAM Cloud Engineering cross-squad team supporting downstream software and data engineering squads, building a high-density automation framework rather than growing headcount.
+      - Architected multi-account hub-and-spoke infrastructure across AWS, Azure and GCP using Transit Gateway, VPC, VPN and centralized identity, consolidating shared data platform services including data lakes, Glue, Lambda, RDS and Redshift.
+      - Established platform self-service patterns and GitHub Actions reusable workflows that replaced batch releases with continuous production delivery.
+      - Drove FinOps rightsizing, automated resource lifecycle management and decommissioning, reporting spend directly to the director.
+      - Mentored senior and junior engineers into end-to-end incident ownership.
+  - title: Senior SRE Cloud Engineer
+    company: Passei Direto
+    start: 2021-11
+    end: 2022-04
+    featured: true
+    bullets:
+      - Refactored core infrastructure and tuned application performance across AWS VPC, EC2, ECS and Lambda to defend availability under sudden enrolment-driven traffic surges.
+      - Implemented infrastructure as code with Terraform, Terragrunt and Pulumi, and maintained CI/CD across Jenkins and GitHub Actions.
+      - Hardened platform tooling including HashiCorp Vault secret delivery, Backstage service catalog and shared Jenkins libraries, instrumenting Sentry error tracking and SonarQube analysis.
+  - title: DevOps Engineering Lead
+    company: Rdi Software
+    start: 2020-03
+    end: 2021-11
+    # Featuring any one Rdi entry expands the whole 2017-2021 tenure: the three
+    # consecutive Rdi rows are folded into a single role on the site, so the
+    # progression from developer to lead reads as one four-year run.
+    featured: true
+    bullets:
+      - Led a distributed engineering group across the US, Hungary, India and Brazil, establishing delivery KPIs and unifying incident ownership for high-stakes e-commerce order and payment operations.
+      - Migrated the traffic layer from standard ingress controllers to Istio service mesh and from MuleSoft to AWS API Gateway using progressive traffic shifting, completing both cutovers without customer transaction impact.
+      - Operated service discovery and secret management with HashiCorp Consul and Vault, removing static credentials from microservice deployment paths.
+  - title: Senior Software Developer and Senior DevOps Engineer
+    company: Rdi Software
+    start: 2018-11
+    end: 2020-03
+    featured: false
+    bullets:
+      - Engineered the decomposition of a monolithic e-commerce platform into decoupled microservices handling order and payment loops, using Terraform, Helm and reusable Kubernetes deployment modules to isolate failure domains.
+      - Automated infrastructure provisioning and operational tooling with Terraform, Helm, Bash, Python, Ruby, Go and PowerShell across AWS EC2, S3 and Lambda.
+      - Delivered C# fixes in the product layer and drove live upgrades on production KOPS clusters.
+  - title: Software Developer and DevOps
+    company: Rdi Software
+    start: 2017-07
+    end: 2018-11
+    featured: false
+    bullets:
+      - Developed features and defect fixes for a global quick-service restaurant e-commerce platform using C# and .NET.
+      - Automated infrastructure provisioning with Terraform and Chef across multiple Linux distributions.
+  - title: Software Developer DevOps
+    company: Wf - Brains For Your Business
+    start: 2016-05
+    end: 2017-07
+    featured: false
+    bullets:
+      - Built automated CI/CD pipelines from scratch with Jenkins and GitLab SCM for high-volume banking systems at a top-tier Brazilian bank.
+      - Managed IT infrastructure including servers, networks and Zabbix monitoring, and developed IoT-connected web and support systems.
+  - title: Software Developer and DevOps
+    company: Questor Sistemas
+    start: 2014-11
+    end: 2016-05
+    featured: false
+    bullets:
+      - Developed ERP features on the .NET Framework covering account management and product issuance routines.
+      - Managed PostgreSQL and SQL Server databases and stored procedures.
+  - title: Junior Software Developer
+    company: Bradesco
+    start: 2008-04
+    end: 2014-08
+    featured: false
+    bullets:
+      - Developed ASP.NET applications and authored advanced SQL queries, triggers, functions and stored procedures against SQL Server supporting retail banking operations.
+      - Automated virtual machine provisioning and frontend test execution using TFS and Jenkins.
+  - title: Information Technology Infrastructure Analyst
+    company: Worktime Assessorial Ltda
+    start: 2007-06
+    end: 2008-04
+    featured: false
+    bullets:
+      - Maintained corporate network infrastructure for a national telecommunications carrier's customers outside the primary service area.
+
+education:
+  - degree: BSc
+    field: Data Processing
+    institution: São Paulo Faculty Of Technology
+    year: "2005"
+  - degree: Specialization
+    field: Software Engineering
+    institution: PUC-SP
+    year: Expected
+
+certifications:
+  - name: Claude 101
+    issuer: Anthropic
+  - name: Claude Code 101
+    issuer: Anthropic
+  - name: Introduction to Agent Skills
+    issuer: Anthropic
+  - name: AWS Engineer
+    issuer: Pluralsight
+  - name: Advanced Penetration Testing & Corporate Network Intrusion Testing
+    issuer: ""
+  - name: IPv6 Systems
+    issuer: Nic.br
