@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elio Severo Junior — Senior SRE &amp; Cloud Engineer</title>
+<meta name="description" content="Senior SRE &amp; Cloud Engineer. 20&#43; years building and operating large-scale, self-healing AWS estates.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <h1>Elio Severo Junior</h1>
+  <p class="headline">Senior SRE &amp; Cloud Engineer</p>
+  <p class="tagline">20&#43; years building and operating large-scale, self-healing AWS estates</p>
+  <nav class="links">
+    <a href="https://github.com/elioseverojunior">GitHub</a>
+    <a href="https://github.com/elioetibr">Org</a>
+    <a href="https://www.linkedin.com/in/elio">LinkedIn</a>
+    <a href="https://stackoverflow.com/users/4868262">Stack Overflow</a>
+  </nav>
+</header>
+
+<main>
+<section aria-labelledby="about">
+  <h2 id="about">About</h2>
+  <p>Senior SRE and cloud engineering leader with 20&#43; years building and operating large-scale, self-healing AWS estates, with production depth across Azure and GCP. Industry coverage spans B2B SaaS, agribusiness, EdTech, quick-service restaurant e-commerce and retail banking, delivered hands-on and as manager of distributed cross-border squads. I also author and maintain published open-source infrastructure tooling in Rust and Go.</p>
+  <p>Currently <strong>Senior SRE Cloud Engineer</strong> at
+     <strong>Viafoura</strong>.</p>
+</section>
+
+<section aria-labelledby="impact">
+  <h2 id="impact">Impact</h2>
+  <ul class="impact">
+    <li><span class="metric">243</span>
+        <span class="label">core applications migrated from legacy KOPS to AWS EKS 1.33</span>
+        <span class="detail">zero customer-facing downtime via Route53 weighted routing, Argo Rollouts and Istio traffic shifting</span></li>
+    <li><span class="metric">35%</span>
+        <span class="label">EC2 spend reduction</span>
+        <span class="detail">Karpenter consolidation, ARM64 Graviton node pools and automated spot execution</span></li>
+    <li><span class="metric">~60%</span>
+        <span class="label">mean-time-to-detect reduction on production incidents</span>
+        <span class="detail">observability codified as infrastructure across Grafana Cloud, Loki, Prometheus, Datadog and OpenTelemetry</span></li>
+    <li><span class="metric">83%</span>
+        <span class="label">deployment lead-time reduction</span>
+        <span class="detail">quarterly release batches replaced by twice-monthly production delivery</span></li>
+  </ul>
+</section>
+
+<section aria-labelledby="oss">
+  <h2 id="oss">Open source</h2>
+  <p class="note">36,548 downloads combined.</p>
+  <ul class="cards">
+    <li class="card">
+      <h3><a href="https://crates.io/crates/rust-yaml">rust-yaml</a></h3>
+      <p>Fast, safe YAML 1.2 library for Rust</p>
+      <p class="count">30,254 downloads</p>
+      <pre><code>cargo add rust-yaml</code></pre>
+    </li>
+    <li class="card">
+      <h3><a href="https://registry.terraform.io/providers/elioseverojunior/strcase">elioseverojunior/strcase</a></h3>
+      <p>String case conversion functions for Terraform</p>
+      <p class="count">3,920 downloads</p>
+      <pre><code>terraform {
+  required_providers {
+    strcase = {
+      source = "elioseverojunior/strcase"
+    }
+  }
+}</code></pre>
+    </li>
+    <li class="card">
+      <h3><a href="https://registry.terraform.io/providers/elioseverojunior/kind">elioseverojunior/kind</a></h3>
+      <p>Ephemeral Kubernetes-in-Docker clusters for CI and local test harnesses</p>
+      <p class="count">929 downloads</p>
+      <pre><code>terraform {
+  required_providers {
+    kind = {
+      source = "elioseverojunior/kind"
+    }
+  }
+}</code></pre>
+    </li>
+    <li class="card">
+      <h3><a href="https://registry.terraform.io/providers/elioseverojunior/docker">elioseverojunior/docker</a></h3>
+      <p>Declarative container lifecycle and image resources</p>
+      <p class="count">716 downloads</p>
+      <pre><code>terraform {
+  required_providers {
+    docker = {
+      source = "elioseverojunior/docker"
+    }
+  }
+}</code></pre>
+    </li>
+    <li class="card">
+      <h3><a href="https://registry.terraform.io/providers/elioetibr/dnsmasq">elioetibr/dnsmasq</a></h3>
+      <p>Local DNS record management as infrastructure as code</p>
+      <p class="count">468 downloads</p>
+      <pre><code>terraform {
+  required_providers {
+    dnsmasq = {
+      source = "elioetibr/dnsmasq"
+    }
+  }
+}</code></pre>
+    </li>
+    <li class="card">
+      <h3><a href="https://registry.terraform.io/providers/elioetibr/sops">elioetibr/sops</a></h3>
+      <p>Native decryption of SOPS-managed secrets inside Terraform plans</p>
+      <p class="count">261 downloads</p>
+      <pre><code>terraform {
+  required_providers {
+    sops = {
+      source = "elioetibr/sops"
+    }
+  }
+}</code></pre>
+    </li>
+  </ul>
+  <p class="note">Recently shipped: <strong>comply</strong> — REUSE/SPDX compliance tooling for Rust (July 2026).
+     Crates: <a href="https://crates.io/crates/comply">comply</a>, <a href="https://crates.io/crates/comply-cli">comply-cli</a>.
+     Source: <a href="https://github.com/elioseverojunior/comply">elioseverojunior/comply</a>.</p>
+</section>
+
+<section aria-labelledby="skills">
+  <h2 id="skills">Skills</h2>
+  <dl class="skills">
+    <dt>Languages</dt>
+    <dd>Rust · Go · Python · C# · Ruby · Bash · PowerShell · SQL</dd>
+    <dt>Cloud</dt>
+    <dd>AWS · Azure · GCP</dd>
+    <dt>Orchestration</dt>
+    <dd>Kubernetes · EKS · KOPS · Helm · Istio · ArgoCD · Argo Rollouts · Karpenter · Docker</dd>
+    <dt>Infrastructure as Code</dt>
+    <dd>Terraform · OpenTofu · Terragrunt · Pulumi</dd>
+    <dt>Observability</dt>
+    <dd>Grafana · Grafana Cloud · Prometheus · Loki · OpenTelemetry · Datadog · CloudWatch</dd>
+    <dt>Data</dt>
+    <dd>Apache Airflow · AWS Glue · Athena · Lake Formation · Step Functions · Redshift · PostgreSQL · Liquibase</dd>
+    <dt>Security</dt>
+    <dd>HashiCorp Vault · Consul · SOPS · SonarQube · Snyk</dd>
+  </dl>
+</section>
+
+<section aria-labelledby="experience">
+  <h2 id="experience">Experience</h2>
+  <article class="role">
+    <h3>Senior SRE Cloud Engineer</h3>
+    <p class="meta">Viafoura · 2024-10 – present</p>
+    <ul>
+      <li>Led the KOPS to AWS EKS 1.33 migration of the core application estate using Route53 weighted routing, Argo Rollouts and Istio traffic shifting, completing cutover without customer-facing downtime.</li>
+      <li>Containerized legacy workloads and authored Helm charts guarded by values.schema.json, rejecting invalid GitOps values before they reach a cluster.</li>
+      <li>Provisioned data-lake and analytics infrastructure with Terraform and OpenTofu across Athena, Glue Data Catalog, Redshift, Step Functions and Airflow, applying Lake Formation column- and table-level governance for least-privilege analyst access.</li>
+      <li>Codified observability as infrastructure in Terraform across Grafana Cloud dashboards, Loki log pipelines, Prometheus alert rules, Datadog dashboards and label-based Slack routing with OpenTelemetry.</li>
+      <li>Standardized multi-account governance with AWS Account Factory for Terraform, Well-Architected guardrails and IAM Identity Center, and migrated legacy Jenkins jobs to declarative GitHub Actions reusable workflows with ArgoCD-centralized GitOps enabling canary and blue-green releases.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Senior SRE Cloud Engineer</h3>
+    <p class="meta">Stanza Systems · 2023-10 – 2024-10</p>
+    <ul>
+      <li>Provisioned secure Amazon SageMaker and Bedrock endpoints with Terraform using scoped IAM execution roles, VPC network isolation and per-workload budget guardrails.</li>
+      <li>Maintained multi-environment GitLab CI/CD pipelines enforcing a strict validate, plan and gated apply workflow with Jira ticket-first traceability.</li>
+      <li>Tuned Karpenter-based autoscaling and cluster ingress to absorb variable demand without over-provisioning.</li>
+      <li>Gated production deployment with SAST scanning, SonarQube quality gates, SOPS-encrypted Helm secrets and ArgoCD sync policies.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>SRE Cloud Engineering Manager</h3>
+    <p class="meta">Nutrien Soluções Agrícolas · 2022-04 – 2023-09</p>
+    <ul>
+      <li>Led the LATAM Cloud Engineering cross-squad team supporting downstream software and data engineering squads, building a high-density automation framework rather than growing headcount.</li>
+      <li>Architected multi-account hub-and-spoke infrastructure across AWS, Azure and GCP using Transit Gateway, VPC, VPN and centralized identity, consolidating shared data platform services including data lakes, Glue, Lambda, RDS and Redshift.</li>
+      <li>Established platform self-service patterns and GitHub Actions reusable workflows that replaced batch releases with continuous production delivery.</li>
+      <li>Drove FinOps rightsizing, automated resource lifecycle management and decommissioning, reporting spend directly to the director.</li>
+      <li>Mentored senior and junior engineers into end-to-end incident ownership.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Senior SRE Cloud Engineer</h3>
+    <p class="meta">Passei Direto · 2021-11 – 2022-04</p>
+    <ul>
+      <li>Refactored core infrastructure and tuned application performance across AWS VPC, EC2, ECS and Lambda to defend availability under sudden enrolment-driven traffic surges.</li>
+      <li>Implemented infrastructure as code with Terraform, Terragrunt and Pulumi, and maintained CI/CD across Jenkins and GitHub Actions.</li>
+      <li>Hardened platform tooling including HashiCorp Vault secret delivery, Backstage service catalog and shared Jenkins libraries, instrumenting Sentry error tracking and SonarQube analysis.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>DevOps Engineering Lead</h3>
+    <p class="meta">Rdi Software · 2020-03 – 2021-11</p>
+    <ul>
+      <li>Led a distributed engineering group across the US, Hungary, India and Brazil, establishing delivery KPIs and unifying incident ownership for high-stakes e-commerce order and payment operations.</li>
+      <li>Migrated the traffic layer from standard ingress controllers to Istio service mesh and from MuleSoft to AWS API Gateway using progressive traffic shifting, completing both cutovers without customer transaction impact.</li>
+      <li>Operated service discovery and secret management with HashiCorp Consul and Vault, removing static credentials from microservice deployment paths.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Senior Software Developer and Senior DevOps Engineer</h3>
+    <p class="meta">Rdi Software · 2018-11 – 2020-03</p>
+    <ul>
+      <li>Engineered the decomposition of a monolithic e-commerce platform into decoupled microservices handling order and payment loops, using Terraform, Helm and reusable Kubernetes deployment modules to isolate failure domains.</li>
+      <li>Automated infrastructure provisioning and operational tooling with Terraform, Helm, Bash, Python, Ruby, Go and PowerShell across AWS EC2, S3 and Lambda.</li>
+      <li>Delivered C# fixes in the product layer and drove live upgrades on production KOPS clusters.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Software Developer and DevOps</h3>
+    <p class="meta">Rdi Software · 2017-07 – 2018-11</p>
+    <ul>
+      <li>Developed features and defect fixes for a global quick-service restaurant e-commerce platform using C# and .NET.</li>
+      <li>Automated infrastructure provisioning with Terraform and Chef across multiple Linux distributions.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Software Developer DevOps</h3>
+    <p class="meta">Wf - Brains For Your Business · 2016-05 – 2017-07</p>
+    <ul>
+      <li>Built automated CI/CD pipelines from scratch with Jenkins and GitLab SCM for high-volume banking systems at a top-tier Brazilian bank.</li>
+      <li>Managed IT infrastructure including servers, networks and Zabbix monitoring, and developed IoT-connected web and support systems.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Software Developer and DevOps</h3>
+    <p class="meta">Questor Sistemas · 2014-11 – 2016-05</p>
+    <ul>
+      <li>Developed ERP features on the .NET Framework covering account management and product issuance routines.</li>
+      <li>Managed PostgreSQL and SQL Server databases and stored procedures.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Junior Software Developer</h3>
+    <p class="meta">Bradesco · 2008-04 – 2014-08</p>
+    <ul>
+      <li>Developed ASP.NET applications and authored advanced SQL queries, triggers, functions and stored procedures against SQL Server supporting retail banking operations.</li>
+      <li>Automated virtual machine provisioning and frontend test execution using TFS and Jenkins.</li>
+    </ul>
+  </article>
+  <article class="role">
+    <h3>Information Technology Infrastructure Analyst</h3>
+    <p class="meta">Worktime Assessorial Ltda · 2007-06 – 2008-04</p>
+    <ul>
+      <li>Maintained corporate network infrastructure for a national telecommunications carrier&#39;s customers outside the primary service area.</li>
+    </ul>
+  </article>
+</section>
+
+<section aria-labelledby="education">
+  <h2 id="education">Education &amp; certifications</h2>
+  <ul>
+    <li>BSc, Data Processing — São Paulo Faculty Of Technology (2005)</li>
+    <li>Specialization, Software Engineering — PUC-SP (Expected)</li>
+  </ul>
+  <ul class="certs">
+    <li>Claude 101 — Anthropic</li>
+    <li>Claude Code 101 — Anthropic</li>
+    <li>Introduction to Agent Skills — Anthropic</li>
+    <li>AWS Engineer — Pluralsight</li>
+    <li>Advanced Penetration Testing &amp; Corporate Network Intrusion Testing</li>
+    <li>IPv6 Systems — Nic.br</li>
+  </ul>
+</section>
+</main>
+
+<footer>
+  <p>Generated from a private source of truth. <a href="https://github.com/elioseverojunior">github.com/elioseverojunior</a></p>
+</footer>
+</body>
+</html>
